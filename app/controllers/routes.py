@@ -5,7 +5,7 @@ from flask import Blueprint
 from flask import current_app
 from flask import request
 
-from app.controllers import assignment_controller
+from app.controllers import assignment_controller, rest_auth_controller
 from app.controllers import config_controller
 from app.controllers import launch_controller
 from app.controllers import oidc_controller
@@ -40,7 +40,7 @@ def launch():
 
 @blueprint.route("/authcode")
 def authcode():
-    return launch_controller.authcode(request)
+    return rest_auth_controller.authcode(request)
 
 
 @blueprint.route("/create_assignment", methods=["POST"])

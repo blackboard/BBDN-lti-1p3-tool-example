@@ -7,6 +7,7 @@ from flask import abort
 from flask import redirect
 from flask import render_template
 
+from app.controllers import rest_auth_controller
 from app.models.jwt import LTIJwtPayload
 from app.models.platform_config import LTIPlatform
 from app.models.platform_config import LTIPlatformStorage
@@ -15,6 +16,7 @@ from app.models.state import LTIStateStorage
 from app.models.tool_config import LTITool
 from app.models.tool_config import LTIToolStorage
 from app.utility import init_logger
+from app.utility.learn_client import LearnClient
 from app.utility.token_client import GrantType
 from app.utility.token_client import TokenClient
 
@@ -81,11 +83,8 @@ def launch(request):
         }
 
         encoded_params = urlencode(params)
-        product_family_code = jwt_request.payload["https://purl.imsglobal.org/spec/lti/claim/tool_platform"][
-            "product_family_code"
-        ]
         # 3LO
-        if "BlackboardLearn" == product_family_code:
+        if "BlackboardLearn" == jwt_request.platform_product_code:
             learn_url = jwt_request.payload["https://purl.imsglobal.org/spec/lti/claim/tool_platform"]["url"].rstrip(
                 "/"
             )
@@ -96,31 +95,6 @@ def launch(request):
             return render_ui(jwt_request, request_post_state, id_token)
     except Exception as e:
         abort(500, e)
-
-
-def authcode(request):
-    auth_code = request.args.get("code", "")
-    request_cookie_state = request.cookies.get("state")
-    state: LTIState = LTIState(LTIStateStorage()).load(request_cookie_state)
-
-    id_token = state.record.id_token
-    jwt_request = LTIJwtPayload(id_token)
-
-    lti_tool = LTITool(LTIToolStorage())
-    auth_code_url = lti_tool.config.auth_code_url()
-    # Now we need to load the original JWT from cache to get all the data again.
-    product_family_code = jwt_request.payload["https://purl.imsglobal.org/spec/lti/claim/tool_platform"][
-        "product_family_code"
-    ]
-    # 3LO
-    if "BlackboardLearn" == product_family_code:
-        learn_url = jwt_request.payload["https://purl.imsglobal.org/spec/lti/claim/tool_platform"]["url"].rstrip("/")
-        learn_access_token = TokenClient().get_learn_access_token(learn_url, auth_code_url, auth_code)
-        # Cache the REST access token
-        state.record.set_platform_learn_rest_token(learn_access_token)
-        state.save()
-
-    return render_ui(jwt_request, request_cookie_state, id_token)
 
 
 def render_ui(jwt_request, state, id_token):
@@ -136,11 +110,11 @@ def render_ui(jwt_request, state, id_token):
 
     tool = LTITool(LTIToolStorage())
 
-    course_info = get_course_info(jwt_request, state)
-    if "created" in course_info:
-        course_created_date = course_info["created"]
-    else:
-        course_created_date = ""
+    course_created_date = ""
+    if "BlackboardLearn" == jwt_request.platform_product_code:
+        course_info = LearnClient().get_course_info(jwt_request, state)
+        if "created" in course_info:
+            course_created_date = course_info["created"]
 
     if jwt_request.payload["https://purl.imsglobal.org/spec/lti/claim/message_type"] == "LtiResourceLinkRequest":
         action_url = f"{tool.config.base_url()}/submit_assignment"
@@ -163,22 +137,6 @@ def render_ui(jwt_request, state, id_token):
             id_token=id_token,
             action_url=action_url,
         )
-
-
-def get_course_info(jwt_request, request_cookie_state):
-    state: LTIState = LTIState(LTIStateStorage()).load(request_cookie_state)
-    learn_access_token = state.record.get_platform_learn_rest_token()
-    learn_url = jwt_request.payload["https://purl.imsglobal.org/spec/lti/claim/tool_platform"]["url"].rstrip("/")
-    course_uuid = jwt_request.payload["https://purl.imsglobal.org/spec/lti/claim/context"]["id"]
-    headers = {"Authorization": f"Bearer {learn_access_token}"}
-    course_info_url = f"{learn_url}/learn/api/public/v2/courses/uuid:{course_uuid}"
-    response = requests.get(course_info_url, headers=headers)
-
-    if response.status_code == 200:
-        return response.json()
-    else:
-        print(f"Error getting course info via Learn public API, status: {response.status_code}")
-        return {}
 
 
 def __log():
