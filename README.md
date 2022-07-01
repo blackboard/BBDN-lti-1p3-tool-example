@@ -1,4 +1,4 @@
-# LTI Signup Tool
+# LTI Example Tool
 
 This is an LTI tool allow an instructor to create an assessment, and allow students to complete the assessment and get a grade
 
@@ -43,7 +43,7 @@ At this point you can now deploy the stacks to you AWS account
 To deploy the pipeline issue the following command
 
 ```
-$ cdk deploy -c account=$AWS_DEFAULT_ACCOUNT -c region=$AWS_DEFAULT_REGION -c repo=<THE_GITHUB_ORG>/<THE_GIT_HUB_REPOSITORY> -c branch=$(git rev-parse --abbrev-ref HEAD) -c codestar_connection_arn=<CODESTART_CONNECTION_ARN> pipeline-stack-$(git rev-parse --abbrev-ref HEAD | sed -e 's/\//-/g')
+$ cdk deploy -c account=$AWS_DEFAULT_ACCOUNT -c region=$AWS_DEFAULT_REGION -c repo=<THE_GITHUB_ORG>/<THE_GIT_HUB_REPOSITORY> -c branch=$(git rev-parse --abbrev-ref HEAD) -c codestar_connection_arn=<CODESTART_CONNECTION_ARN> pipeline-stack-$(git rev-parse --abbrev-ref HEAD | sed -e 's/\//-/g') -a "python pipeline.py pipeline-stack-$(git rev-parse --abbrev-ref HEAD | sed -e 's/\//-/g')
 ```
 
 To complete the pipeline setup you must go into the AWS Console, navigate to CodePipeline, on the left hand side expand "Settings" and click "Connections"
