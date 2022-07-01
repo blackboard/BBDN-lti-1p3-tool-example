@@ -26,6 +26,7 @@ class LTIJwtPayload(BaseModel):
     platform_url: Optional[str] = None
     sub: Optional[str] = None
     ttl: Optional[int] = 0
+    platform_product_code: Optional[str] = None
 
     def __init__(self, token: Optional[str] = None, **kwargs):
         super().__init__(**kwargs)
@@ -60,7 +61,11 @@ class LTIJwtPayload(BaseModel):
                 else ""
             )
             self.sub = payload["sub"]
-
+            self.platform_product_code = (
+                payload["https://purl.imsglobal.org/spec/lti/claim/tool_platform"]["product_family_code"]
+                if "https://purl.imsglobal.org/spec/lti/claim/tool_platform" in payload
+                else ""
+            )
         else:
             self.__log().debug("no params")
 

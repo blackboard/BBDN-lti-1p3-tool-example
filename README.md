@@ -43,7 +43,7 @@ At this point you can now deploy the stacks to you AWS account
 To deploy the pipeline issue the following command
 
 ```
-$ cdk deploy -c account=$AWS_DEFAULT_ACCOUNT -c region=$AWS_DEFAULT_REGION -c repo=<THE_GITHUB_ORG>/<THE_GIT_HUB_REPOSITORY> -c branch=$(git rev-parse --abbrev-ref HEAD) -c codestar_connection_arn=<CODESTART_CONNECTION_ARN> pipeline-stack-$(git rev-parse --abbrev-ref HEAD | sed -e 's/\//-/g') -a "python pipeline.py pipeline-stack-$(git rev-parse --abbrev-ref HEAD | sed -e 's/\//-/g')
+$ cdk deploy -c account=$AWS_DEFAULT_ACCOUNT -c region=$AWS_DEFAULT_REGION -c repo=<THE_GITHUB_ORG>/<THE_GIT_HUB_REPOSITORY> -c branch=$(git rev-parse --abbrev-ref HEAD) -c codestar_connection_arn=<CODESTART_CONNECTION_ARN> -a "python pipeline.py pipeline-stack-$(git rev-parse --abbrev-ref HEAD | sed -e 's/\//-/g')
 ```
 
 To complete the pipeline setup you must go into the AWS Console, navigate to CodePipeline, on the left hand side expand "Settings" and click "Connections"
@@ -114,7 +114,8 @@ export PORT=5000
 export DOMAIN=127.0.0.1
 export KMS_KEY_ID='arn:aws:kms:???'
 export KMS_SYMMETRIC_KEY_ID='arn:aws:kms:???'
-# The next five are stored in ParameterStore. Create keys for your instance
+
+# The next three are stored in ParameterStore. Create keys for your instance
 export LTI_TOOLING_API_URL_KEY='/keys/somewhere/tool_url'
 export LEARN_APPLICATION_KEY_KEY='/keys/somewhere/learn_key'
 export LEARN_APPLICATION_SECRET_KEY='/keys/somewhere/learn_secret'```
