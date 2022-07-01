@@ -1,0 +1,102 @@
+#!/usr/bin/env bash
+# What is this file? https://github.com/adriancooney/Taskfile
+
+# Enable stricter Bash http://redsymbol.net/articles/unofficial-bash-strict-mode/+
+set -Euo pipefail
+
+# Install all the things!
+function install {
+  install-cdk
+  env "${1:-}"
+}
+
+# Globally install CDK and plugins
+function install-cdk {
+  echo "📦 Installing aws-cdk"
+  npm install -g aws-cdk
+}
+
+# Setup the venv directory
+function env {
+  if [[ ${1:-} == "full" ]]; then
+    pyenv-env
+  fi
+
+  # In GitHub Actions, don't use virtual environment
+  if [[ -z ${GITHUB_ACTIONS:-} ]]; then
+    echo "🐍 Recreating venv - you must call venv/bin/activate yourself"
+    rm -rf venv
+    ~/.pyenv/versions/3.9.7/bin/python -m venv venv
+    . venv/bin/activate
+  fi
+
+  # If first parameter is "fast", then use pip as it is slightly faster
+  if [[ ${1:-} == "fast" ]]; then
+    echo "📦 Installing requirements.txt with pip"
+    pip install -r requirements.txt
+  else
+    echo "📦 Installing pip-tools and running pip-sync"
+    pip install --upgrade pip
+    pip install pip-tools
+    pip-sync
+  fi
+
+}
+
+function pyenv-env {
+  brew install pyenv
+  local pythonVersion="3.9.7"
+  echo "🐍 Creating pyenv named $pythonVersion with Python $pythonVersion"
+  pyenv install --skip-existing "$pythonVersion"
+
+  echo "🐍 Created pyenv version named $pythonVersion"
+}
+
+# Recursively runs Python tests
+function test-py {
+  echo "🐍 Running Python tests"
+  python3 -m unittest -v
+}
+
+# Run all unit tests
+function test {
+  test-py
+  echo
+  test-go
+  echo
+  test-boundary
+}
+
+# Login to SSO using yawsso and the AWS_PROFILE environment variable
+function login {
+  yawsso login --profile "${AWS_PROFILE}"
+}
+
+function help {
+  echo "USAGE:"
+  echo "  $0 <task> <args>"
+  echo "Tasks:"
+  compgen -A function | cat -n
+}
+
+# Upgrade all the libraries in the requirements.in to the latest versions
+function upgrade-packages {
+  set -ex
+
+  # Generate requirements.in
+  for req in $(git ls-files | grep requirements.in); do
+    pushd $(dirname $req)
+    if [[ -f "requirements.txt" ]]; then
+      echo "$req"
+      rm requirements.txt
+    fi
+    pip-compile --quiet --upgrade --no-emit-index-url
+    popd
+  done
+
+  # Sync venv with required Python packages
+  git ls-files | grep requirements.in | xargs pip-sync
+}
+
+TIMEFORMAT="Task completed in %3lR"
+time "${@:-help}"

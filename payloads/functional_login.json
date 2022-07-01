@@ -1,0 +1,115 @@
+{
+  "resource": "/{proxy+}",
+  "path": "/login",
+  "httpMethod": "GET",
+  "headers": {
+    "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8",
+    "Accept-Encoding": "gzip, deflate, br",
+    "Accept-Language": "en-US,en;q=0.5",
+    "CloudFront-Forwarded-Proto": "https",
+    "CloudFront-Is-Desktop-Viewer": "true",
+    "CloudFront-Is-Mobile-Viewer": "false",
+    "CloudFront-Is-SmartTV-Viewer": "false",
+    "CloudFront-Is-Tablet-Viewer": "false",
+    "CloudFront-Viewer-Country": "US",
+    "Cookie": "AMCVS_7742037254C95E840A4C98A6%40AdobeOrg=1; AMCV_7742037254C95E840A4C98A6%40AdobeOrg=1585540135%7CMCIDTS%7C19167%7CMCMID%7C85249580962387521971924011482303971049%7CMCAAMLH-1656611307%7C7%7CMCAAMB-1656611307%7C6G1ynYcLPuiQxYZrsz_pkqfLG9yMXBpb2zX5dvJdYQJzPXImdj0y%7CMCOPTOUT-1656013707s%7Cnull%7CMCAID%7Cnull%7CvVersion%7C4.4.0%7CMCSYNCSOP%7C411-19174; s_cc=true; s_fid=67F354134850393E-0AA0D258A6294D7A; s_sq=%5B%5BB%5D%5D; state=ee781372-e9d6-4650-85c3-5db8927a61c8",
+    "Host": "TOOL_DOMAIN_NAME",
+    "Referer": "https://LEARN_DOMAIN_NAME/",
+    "sec-fetch-dest": "iframe",
+    "sec-fetch-mode": "navigate",
+    "sec-fetch-site": "cross-site",
+    "upgrade-insecure-requests": "1",
+    "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:91.0) Gecko/20100101 Firefox/91.0",
+    "Via": "2.0 19ae496eb414e9373ed8ce49d0fdbba2.cloudfront.net (CloudFront)",
+    "X-Amz-Cf-Id": "dgI4XQTT6EZeMPrPAmVglHokJjaRgTnMVfKl7oqFnfbdlj912zIhrA==",
+    "X-Amzn-Trace-Id": "Root=1-62bb1aed-343f971d5718dfe663a3a081",
+    "X-Forwarded-For": "52.94.133.129, 70.132.32.146",
+    "X-Forwarded-Port": "443",
+    "X-Forwarded-Proto": "https"
+  },
+  "multiValueHeaders": {
+    "Accept": ["text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8"],
+    "Accept-Encoding": ["gzip, deflate, br"],
+    "Accept-Language": ["en-US,en;q=0.5"],
+    "CloudFront-Forwarded-Proto": ["https"],
+    "CloudFront-Is-Desktop-Viewer": ["true"],
+    "CloudFront-Is-Mobile-Viewer": ["false"],
+    "CloudFront-Is-SmartTV-Viewer": ["false"],
+    "CloudFront-Is-Tablet-Viewer": ["false"],
+    "CloudFront-Viewer-Country": ["US"],
+    "Cookie": [
+      "AMCVS_7742037254C95E840A4C98A6%40AdobeOrg=1; AMCV_7742037254C95E840A4C98A6%40AdobeOrg=1585540135%7CMCIDTS%7C19167%7CMCMID%7C85249580962387521971924011482303971049%7CMCAAMLH-1656611307%7C7%7CMCAAMB-1656611307%7C6G1ynYcLPuiQxYZrsz_pkqfLG9yMXBpb2zX5dvJdYQJzPXImdj0y%7CMCOPTOUT-1656013707s%7Cnull%7CMCAID%7Cnull%7CvVersion%7C4.4.0%7CMCSYNCSOP%7C411-19174; s_cc=true; s_fid=67F354134850393E-0AA0D258A6294D7A; s_sq=%5B%5BB%5D%5D; state=ee781372-e9d6-4650-85c3-5db8927a61c8"
+    ],
+    "Host": ["TOOL_DOMAIN_NAME"],
+    "Referer": ["https://LEARN_DOMAIN_NAME/"],
+    "sec-fetch-dest": ["iframe"],
+    "sec-fetch-mode": ["navigate"],
+    "sec-fetch-site": ["cross-site"],
+    "upgrade-insecure-requests": ["1"],
+    "User-Agent": ["Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:91.0) Gecko/20100101 Firefox/91.0"],
+    "Via": ["2.0 19ae496eb414e9373ed8ce49d0fdbba2.cloudfront.net (CloudFront)"],
+    "X-Amz-Cf-Id": ["dgI4XQTT6EZeMPrPAmVglHokJjaRgTnMVfKl7oqFnfbdlj912zIhrA=="],
+    "X-Amzn-Trace-Id": ["Root=1-62bb1aed-343f971d5718dfe663a3a081"],
+    "X-Forwarded-For": ["52.94.133.129, 70.132.32.146"],
+    "X-Forwarded-Port": ["443"],
+    "X-Forwarded-Proto": ["https"]
+  },
+  "queryStringParameters": {
+    "client_id": "75363971-2683-4ad9-a31b-93ec41e27772",
+    "iss": "https://blackboard.com",
+    "login_hint": "https%3A%2F%2FLEARN_DOMAIN_NAME%2Fwebapps%2Fblackboard%2Fexecute%2Fblti%2FlaunchPlacement%3Fcmd%3Dauthenticate%26course_id%3D_3_1,10ac1fc7a50c4433ae104c283cc66e47,ec5ded2ded8e4b05ab5c5f8d2d40671a",
+    "lti_deployment_id": "f66151aa-a799-4b22-93ed-81dd16f70a4e",
+    "lti_message_hint": "eyJwbGFjZW1lbnRJZCI6Il85XzEiLCJwb3NpdGlvbiI6LTEsImN1c3RvbVBhcmFtcyI6e30sInJlc291cmNlTGlua0lkIjoiXzNfMXNpZ24tdXAtbGlzdCIsInRhcmdldE92ZXJyaWRlIjpudWxsLCJmcm9tVWx0cmEiOmZhbHNlLCJmcm9tR3JhZGVDZW50ZXIiOmZhbHNlLCJvcGVuTmV3V2luZG93IjpmYWxzZSwiZGVlcExpbmtMYXVuY2giOmZhbHNlLCJwYXJlbnRDb250ZW50SWQiOiIiLCJjb3Vyc2VJZCI6Il8zXzEiLCJjb250ZW50SWQiOm51bGwsIm9wZW5JbkxpZ2h0Qm94IjpmYWxzZSwiaW5saW5lTW9kZSI6ZmFsc2UsInRhcmdldExpbmtVcmwiOiJodHRwczovL3ltaGs5OW5zN2cuZXhlY3V0ZS1hcGkudXMtZWFzdC0yLmFtYXpvbmF3cy5jb20vcHJvZC9pbXMvbGF1bmNoIn0=",
+    "lti_storage_target": "lti_storage_frame",
+    "target_link_uri": "https://TOOL_DOMAIN_NAME/prod/launch"
+  },
+  "multiValueQueryStringParameters": {
+    "client_id": ["75363971-2683-4ad9-a31b-93ec41e27772"],
+    "iss": ["https://blackboard.com"],
+    "login_hint": [
+      "https%3A%2F%2FLEARN_DOMAIN_NAME%2Fwebapps%2Fblackboard%2Fexecute%2Fblti%2FlaunchPlacement%3Fcmd%3Dauthenticate%26course_id%3D_3_1,10ac1fc7a50c4433ae104c283cc66e47,ec5ded2ded8e4b05ab5c5f8d2d40671a"
+    ],
+    "lti_deployment_id": ["f66151aa-a799-4b22-93ed-81dd16f70a4e"],
+    "lti_message_hint": [
+      "eyJwbGFjZW1lbnRJZCI6Il85XzEiLCJwb3NpdGlvbiI6LTEsImN1c3RvbVBhcmFtcyI6e30sInJlc291cmNlTGlua0lkIjoiXzNfMXNpZ24tdXAtbGlzdCIsInRhcmdldE92ZXJyaWRlIjpudWxsLCJmcm9tVWx0cmEiOmZhbHNlLCJmcm9tR3JhZGVDZW50ZXIiOmZhbHNlLCJvcGVuTmV3V2luZG93IjpmYWxzZSwiZGVlcExpbmtMYXVuY2giOmZhbHNlLCJwYXJlbnRDb250ZW50SWQiOiIiLCJjb3Vyc2VJZCI6Il8zXzEiLCJjb250ZW50SWQiOm51bGwsIm9wZW5JbkxpZ2h0Qm94IjpmYWxzZSwiaW5saW5lTW9kZSI6ZmFsc2UsInRhcmdldExpbmtVcmwiOiJodHRwczovL3ltaGs5OW5zN2cuZXhlY3V0ZS1hcGkudXMtZWFzdC0yLmFtYXpvbmF3cy5jb20vcHJvZC9pbXMvbGF1bmNoIn0="
+    ],
+    "lti_storage_target": ["lti_storage_frame"],
+    "target_link_uri": ["https://TOOL_DOMAIN_NAME/prod/launch"]
+  },
+  "pathParameters": {
+    "proxy": "ims/login"
+  },
+  "stageVariables": null,
+  "requestContext": {
+    "resourceId": "yhn8l9",
+    "resourcePath": "/{proxy+}",
+    "httpMethod": "GET",
+    "extendedRequestId": "UcElNH2HiYcFzfA=",
+    "requestTime": "28/Jun/2022:15:14:53 +0000",
+    "path": "/prod/login",
+    "accountId": "ACCOUNT_ID",
+    "protocol": "HTTP/1.1",
+    "stage": "prod",
+    "domainPrefix": "ymhk99ns7g",
+    "requestTimeEpoch": 1656429293946,
+    "requestId": "06a4f7b0-1a59-43c3-845a-47b7072cfe6a",
+    "identity": {
+      "cognitoIdentityPoolId": null,
+      "accountId": null,
+      "cognitoIdentityId": null,
+      "caller": null,
+      "sourceIp": "52.94.133.129",
+      "principalOrgId": null,
+      "accessKey": null,
+      "cognitoAuthenticationType": null,
+      "cognitoAuthenticationProvider": null,
+      "userArn": null,
+      "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:91.0) Gecko/20100101 Firefox/91.0",
+      "user": null
+    },
+    "domainName": "TOOL_DOMAIN_NAME",
+    "apiId": "API_ID"
+  },
+  "body": null,
+  "isBase64Encoded": false
+}

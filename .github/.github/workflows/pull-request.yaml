@@ -1,0 +1,158 @@
+name: pr
+
+on:
+  pull_request:
+    branches:
+      - main
+
+env:
+  GIT_AUTHOR_NAME: github-actions[bot]
+  GIT_AUTHOR_EMAIL: 41898282+github-actions[bot]@users.noreply.github.com
+  GIT_COMMITTER_NAME: GitHub
+  GIT_COMMITTER_EMAIL: noreply@github.com
+  CDK_DEFAULT_ACCOUNT: 111111111111
+  CDK_DEFAULT_REGION: us-east-1
+  CDK_DEPLOY_STAGES: dev int tp prod
+  CDK_DEPLOY_dev_ACCOUNTS: 111111111111
+  CDK_DEPLOY_int_ACCOUNTS: 111111111111
+  CDK_DEPLOY_tp_ACCOUNTS: 333333333333
+  CDK_DEPLOY_prod_ACCOUNTS: 333333333333
+  CDK_DEPLOY_dev_111111111111_REGIONS: us-east-1
+  CDK_DEPLOY_int_111111111111_REGIONS: us-east-1
+  CDK_DEPLOY_tp_333333333333_REGIONS: us-east-1
+  CDK_DEPLOY_prod_333333333333_REGIONS: us-east-1
+
+jobs:
+  cdk-diff:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Setup NodeJS
+        uses: actions/setup-node@v1
+        with:
+          node-version: "12"
+
+      - name: Setup Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: "3.9"
+
+      - name: Install CDK
+        run: npm install -g aws-cdk@1
+
+      - name: Checkout main
+        uses: actions/checkout@v2
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: Setup Artifactory
+        uses: blackboard-innersource/gh-action-setup-artifactory@main
+        env:
+          ARTIFACTORY_USERNAME: ${{ secrets.ARTIFACTORY_USERNAME }}
+          ARTIFACTORY_TOKEN: ${{ secrets.ARTIFACTORY_TOKEN }}
+          ARTIFACTORY_PYPI_INDEX: ${{ secrets.ARTIFACTORY_PYPI_INDEX }}
+          ARTIFACTORY_NPM_REGISTRY: ${{ secrets.ARTIFACTORY_NPM_REGISTRY }}
+
+      - name: Install main dependencies
+        run: pip install pip-tools && pip-sync
+
+      - name: CDK synth main
+        run: cdk synth -o base.cdk.out
+
+      - name: Checkout PR branch
+        uses: actions/checkout@v2
+        with:
+          ref: ${{ github.head_ref }}
+          fetch-depth: 0
+          clean: false
+
+      - name: Merge main to PR branch
+        run: git merge origin/main
+
+      - name: Install PR branch dependencies
+        run: pip-sync
+
+      - name: CDK synth PR branch
+        run: cdk synth -o head.cdk.out
+
+      - name: Diff CDK synth outputs
+        id: diff
+        uses: blackboard-innersource/gh-action-cdk-diff@v1
+
+      - name: Comment on Pull Request
+        uses: actions/github-script@v3
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            var fs = require('fs');
+            github.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: fs.readFileSync('${{ steps.diff.outputs.comment_file }}', 'utf8')
+            })
+
+  # Always run this last as it can push new changes and actions will not rerun.
+  pre-commit:
+    needs: [cdk-diff]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          ref: ${{ github.head_ref }}
+
+      - name: Setup Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: "3.9"
+
+      - name: Install PreCommit
+        run: pip install pre-commit
+
+      - name: Cache
+        uses: actions/cache@v2
+        with:
+          path: ~/.cache/pre-commit
+          key: pre-commit|${{ env.PY }}|${{ hashFiles('.pre-commit-config.yaml') }}
+
+      - name: PreCommit
+        id: pre-commit
+        run: |
+          if SKIP=flake8 pre-commit run --show-diff-on-failure --color=always --all-files; then
+            echo "::set-output name=failed::0"
+          else
+            echo "::set-output name=failed::1"
+          fi
+          if [ -n "$(git status -s)" ]; then
+            echo "::set-output name=dirty::1"
+          else
+            echo "::set-output name=dirty::0"
+          fi
+
+      # Run a second time to verify that everything has indeed been fixed.
+      - name: PreCommit verify
+        if: steps.pre-commit.outputs.failed == 1
+        run: |
+          SKIP=flake8 pre-commit run --show-diff-on-failure --color=always --all-files
+
+      - name: Commit and Push to Pull Request
+        if: steps.pre-commit.outputs.failed == 1 && steps.pre-commit.outputs.dirty == 1
+        run: |
+          git add .
+          git status
+          git commit -m "Automated formatting changes"
+          git push origin ${{ github.head_ref }}
+
+      - name: Comment on Pull Request
+        if: steps.pre-commit.outputs.failed == 1 && steps.pre-commit.outputs.dirty == 1
+        uses: actions/github-script@v3
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            github.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: ':sparkles: :star: A new commit has been added to your pull request to fix formatting! :star: :sparkles:'
+            })

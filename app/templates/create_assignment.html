@@ -1,0 +1,58 @@
+{% extends 'base.html' %} {% block title %}AWS Workshop{% endblock %} {% block header %}AWS Workshop{% endblock %} {%
+block app_content %}
+<h1 class="m-1 h1 fw-semibold">Welcome {{ name }}</h1>
+<div class="container">
+  <form
+    name="create_assignment"
+    action="{{ action_url }}"
+    method="POST"
+    class="shadow-lg p-3 mb-5 bg-body rounded-4 container position-relative"
+  >
+    <h2 class="m-1 mb-3 h2 fw-semibold text-center">Create a New Assignment</h2>
+    <div class="row mb-3 justify-content-center">
+      <div class="col-4">
+        <label for="name" class="row-form-label">Name:</label>
+        <input type="text" class="form-control" placeholder="Name" name="name" id="name" />
+      </div>
+    </div>
+    <div class="row mb-3 justify-content-center">
+      <div class="col-4">
+        <label for="points" class="row-form-label">Points:</label>
+        <input type="text" class="form-control" placeholder="Points" name="points" id="points" />
+      </div>
+    </div>
+    <div class="mt-2 d-flex justify-content-center">
+      <input type="submit" class="btn btn-success" value="Ok" />
+    </div>
+    <input type="hidden" name="id_token" value="{{ id_token }}" />
+  </form>
+</div>
+<div class="m-1 accordion accordion-flush" id="accordionFlush">
+  <div class="accordion-item">
+    <h2 class="m-1 h2 accordion-header fw-semibold" id="flush-headingOne">
+      <button
+        class="accordion-button collapsed bg-secondary text-dark"
+        type="button"
+        data-bs-toggle="collapse"
+        data-bs-target="#flush-collapseOne"
+        aria-expanded="false"
+        aria-controls="flush-collapseOne"
+      >
+        Json sample
+      </button>
+    </h2>
+    <div
+      id="flush-collapseOne"
+      class="accordion-collapse collapse"
+      aria-labelledby="flush-headingOne"
+      data-bs-parent="#accordionFlushExample"
+    >
+      <div class="accordion-body">
+        <pre>{{pretty_body}}</pre>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %} {% block script %}
+<script type="application/javascript"></script>
+{% endblock %}

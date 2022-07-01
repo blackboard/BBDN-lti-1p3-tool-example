@@ -1,0 +1,42 @@
+{% extends 'base.html' %} {% block title %}AWS Workshop{% endblock %} {% block header %}AWS Workshop{% endblock %} {%
+block app_content %}
+<div class="shadow-lg p-3 mb-5 bg-body rounded-4 container position-relative">
+  <h2 class="m-1 h2 fw-semibold text-center">Do you wish to create this assignment?</h2>
+  <div class="m-1">
+    <form name="confirm_assignment" action="{{ return_url }}" method="POST" class="mt-3">
+      <div class="m-1 mb-2 d-flex justify-content-center">
+        <input type="submit" class="btn btn-success" value="Ok" />
+      </div>
+      <input type="hidden" name="JWT" value="{{ jwt }}" />
+    </form>
+  </div>
+</div>
+<div class="m-1 accordion accordion-flush" id="accordionFlush">
+  <div class="accordion-item">
+    <h2 class="m-1 h2 accordion-header fw-semibold" id="flush-headingOne">
+      <button
+        class="accordion-button collapsed bg-secondary text-dark"
+        type="button"
+        data-bs-toggle="collapse"
+        data-bs-target="#flush-collapseOne"
+        aria-expanded="false"
+        aria-controls="flush-collapseOne"
+      >
+        Json sample
+      </button>
+    </h2>
+    <div
+      id="flush-collapseOne"
+      class="accordion-collapse collapse"
+      aria-labelledby="flush-headingOne"
+      data-bs-parent="#accordionFlushExample"
+    >
+      <div class="accordion-body">
+        <pre>{{pretty_body}}</pre>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %} {% block script %}
+<script type="application/javascript"></script>
+{% endblock %}

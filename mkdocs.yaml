@@ -1,0 +1,7 @@
+site_name: "Getting Started with <>"
+site_description: "Documentation about "
+
+nav:
+  - Overview: index.md
+plugins:
+  - techdocs-core

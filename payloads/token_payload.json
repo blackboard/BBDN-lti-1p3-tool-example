@@ -1,0 +1,58 @@
+{
+  "sub": "10ac1fc7a50c4433ae104c283cc66e47",
+  "https://purl.imsglobal.org/spec/lti/claim/deployment_id": "f66151aa-a799-4b22-93ed-81dd16f70a4e",
+  "https://purl.imsglobal.org/spec/lti/claim/version": "1.3.0",
+  "https://purl.imsglobal.org/spec/lti-ags/claim/endpoint": {
+    "lineitems": "https://learn25.anthology.workshops.aws.dev/learn/api/v1/lti/courses/_3_1/lineItems",
+    "scope": [
+      "https://purl.imsglobal.org/spec/lti-ags/scope/lineitem",
+      "https://purl.imsglobal.org/spec/lti-ags/scope/result.readonly",
+      "https://purl.imsglobal.org/spec/lti-ags/scope/score"
+    ]
+  },
+  "iss": "https://blackboard.com",
+  "locale": "en-US",
+  "https://purl.imsglobal.org/spec/lti/claim/tool_platform": {
+    "name": "Blackboard, Inc.",
+    "description": "Blackboard, Inc.",
+    "guid": "236665842bb24bf4833ecac7d13131cb",
+    "product_family_code": "BlackboardLearn",
+    "version": "3900.41.0-rel.16+7c6118d",
+    "url": "https://learn25.anthology.workshops.aws.dev/",
+    "contact_email": "dev@localhost"
+  },
+  "https://purl.imsglobal.org/spec/lti/claim/lis": {
+    "person_sourcedid": "administrator",
+    "course_section_sourcedid": "LTI101"
+  },
+  "https://purl.imsglobal.org/spec/lti/claim/launch_presentation": {
+    "return_url": "https://learn25.anthology.workshops.aws.dev/webapps/blackboard/execute/blti/launchReturn?course_id=_3_1&nonce=d7beb50735134167847bec00615cc5a4&launch_id=4b1c55ab-a642-4862-a540-1308ea5e04d1&link_id=_3_1sign-up-list&launch_time=1655759265325",
+    "locale": "en-US"
+  },
+  "exp": "EXPIRATION",
+  "iat": "NOW",
+  "email": "dev@localhost",
+  "given_name": "Blackboard",
+  "https://purl.imsglobal.org/spec/lti/claim/roles": [
+    "http://purl.imsglobal.org/vocab/lis/v2/institution/person#Administrator"
+  ],
+  "nonce": "NONCE",
+  "https://purl.imsglobal.org/spec/lti/claim/target_link_uri": "https://ymhk99ns7g.execute-api.us-east-2.amazonaws.com/prod/launch",
+  "https://purl.imsglobal.org/spec/lti/claim/context": {
+    "id": "7b0b3748346a407bb4d5c6d466ead9ba",
+    "label": "LTI101",
+    "title": "LTI 101",
+    "type": ["http://purl.imsglobal.org/vocab/lis/v2/course#CourseOffering"]
+  },
+  "https://purl.imsglobal.org/spec/lti/claim/resource_link": {
+    "id": "_3_1sign-up-list"
+  },
+  "aud": "75363971-2683-4ad9-a31b-93ec41e27772",
+  "https://purl.imsglobal.org/spec/lti/claim/message_type": "LtiResourceLinkRequest",
+  "name": "Blackboard Administrator",
+  "family_name": "Administrator",
+  "https://blackboard.com/lti/claim/one_time_session_token": "5ec9b35ef2204bf597205ee748294203",
+  "https://blackboard.com/webapps/foundations-connector/foundations-ids": {
+    "tenant-id": "da5dfeac-45d0-4da4-bd52-f2fae413eab8"
+  }
+}

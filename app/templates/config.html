@@ -1,0 +1,81 @@
+{% extends 'base.html' %} {% block title %}Platform Configuration{% endblock %} {% block header %}Configuration{%
+endblock %} {% block app_content %}
+<div class="container">
+  <form action="{{action_url}}" method="POST" class="shadow-lg p-3 mb-5 bg-body rounded-4 container position-relative">
+    <h2 class="m-1 mb-3 h2 fw-semibold text-center">LTI Configuration</h2>
+    <div class="row mb-3 justify-content-center">
+      <div class="col-6">
+        <label for="client_id" class="row-form-label">Client ID:</label>
+        <input type="text" class="form-control" placeholder="Client ID" name="client_id" id="client_id" />
+      </div>
+    </div>
+    <div class="row mb-3 justify-content-center">
+      <div class="col-6">
+        <label for="iss" class="row-form-label">Issuer:</label>
+        <input type="text" class="form-control" placeholder="Issuer" name="iss" id="iss" />
+      </div>
+    </div>
+    <div class="row mb-3 justify-content-center">
+      <div class="col-6">
+        <label for="key_set_url" class="row-form-label">Platform JWKS URL:</label>
+        <input type="text" class="form-control" placeholder="Platform JWKS URL" name="key_set_url" id="key_set_url" />
+      </div>
+    </div>
+    <div class="row mb-3 justify-content-center">
+      <div class="col-6">
+        <label for="auth_token_url" class="row-form-label text-right">Auth Token URL:</label>
+        <input type="text" class="form-control" placeholder="Token URL" name="auth_token_url" id="auth_token_url" />
+      </div>
+    </div>
+    <div class="row mb-3 justify-content-center">
+      <div class="col-6">
+        <label for="auth_login_url" class="row-form-label">Auth Login URL:</label>
+        <input type="text" class="form-control" placeholder="Login URL" name="auth_login_url" id="auth_login_url" />
+      </div>
+    </div>
+    <div class="row mb-3 justify-content-center">
+      <div class="mb-2 col-6">
+        <label for="lti_deployment_id" class="row-form-label">Deployment ID:</label>
+        <input
+          type="text"
+          class="form-control"
+          placeholder="Deployment ID"
+          name="lti_deployment_id"
+          id="lti_deployment_id"
+        />
+      </div>
+    </div>
+    <hr class="border-dark border-3 opacity-25" />
+    <h2 class="m-1 mb-3 h2 fw-semibold text-center">Learn Configuration</h2>
+    <div class="row mb-3 justify-content-center">
+      <div class="col-6">
+        <label for="learn_app_key" class="row-form-label">Learn Application Key:</label>
+        <input
+          type="text"
+          class="form-control"
+          placeholder="Learn Application Key"
+          name="learn_app_key"
+          id="learn_app_key"
+        />
+      </div>
+    </div>
+    <div class="row mb-3 justify-content-center">
+      <div class="col-6">
+        <label for="learn_app_secret" class="row-form-label">Learn Application Secret:</label>
+        <input
+          type="text"
+          class="form-control"
+          placeholder="Learn Application Secret"
+          name="learn_app_secret"
+          id="learn_app_secret"
+        />
+      </div>
+    </div>
+    <div class="mt-2 d-flex justify-content-center">
+      <input type="submit" class="btn btn-success" value="Ok" />
+    </div>
+  </form>
+</div>
+{% endblock %} {% block script %}
+<script type="application/javascript"></script>
+{% endblock %}

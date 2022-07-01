@@ -1,0 +1,90 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Python: Debug Tests",
+      "type": "python",
+      "request": "launch",
+      "program": "${file}",
+      "purpose": ["debug-test"],
+      "console": "integratedTerminal",
+      "justMyCode": false
+    },
+    {
+      "type": "aws-sam",
+      "request": "direct-invoke",
+      "name": "BBDN-Sign-Up-List-Tool:app/routes.login (python3.9)",
+      "invokeTarget": {
+        "target": "code",
+        "projectRoot": "${workspaceFolder}/",
+        "lambdaHandler": "app/wsgi.lambda_handler"
+      },
+      "lambda": {
+        "memoryMb": 256,
+        "runtime": "python3.9",
+        "payload": {
+          "path": "${workspaceFolder}/payloads/oidc.json"
+        },
+        "environmentVariables": {
+          "TABLE_NAME": "LTIToolCdkStack-ltitableE0BA8EA2-DTWJ84TFS0O2",
+          "STATE_TTL": "7200"
+        }
+      }
+    },
+    {
+      "type": "aws-sam",
+      "request": "direct-invoke",
+      "name": "BBDN-Sign-Up-List-Tool:app/routes.launch (python3.9)",
+      "invokeTarget": {
+        "target": "code",
+        "projectRoot": "${workspaceFolder}/",
+        "lambdaHandler": "app/wsgi.lambda_handler"
+      },
+      "lambda": {
+        "memoryMb": 256,
+        "runtime": "python3.9",
+        "payload": {
+          "path": "${workspaceFolder}/payloads/launch.json"
+        },
+        "environmentVariables": {
+          "TABLE_NAME": "LTIToolCdkStack-ltitableE0BA8EA2-DTWJ84TFS0O2",
+          "STATE_TTL": "7200"
+        }
+      }
+    },
+    {
+      "type": "aws-sam",
+      "request": "direct-invoke",
+      "name": "BBDN-Sign-Up-List-Tool:app/routes.home (python3.9)",
+      "invokeTarget": {
+        "target": "code",
+        "projectRoot": "${workspaceFolder}/",
+        "lambdaHandler": "app/wsgi.lambda_handler"
+      },
+      "lambda": {
+        "memoryMb": 256,
+        "runtime": "python3.9",
+        "payload": {
+          "path": "${workspaceFolder}/payloads/home.json"
+        },
+        "environmentVariables": {}
+      }
+    },
+    {
+      "type": "aws-sam",
+      "request": "direct-invoke",
+      "name": "BBDN-Sign-Up-List-Tool:app/routes.authcode (python3.9)",
+      "invokeTarget": {
+        "target": "code",
+        "projectRoot": "${workspaceFolder}/",
+        "lambdaHandler": "app/wsgi.lambda_handler"
+      },
+      "lambda": {
+        "memoryMb": 256,
+        "runtime": "python3.9",
+        "payload": {},
+        "environmentVariables": {}
+      }
+    }
+  ]
+}
