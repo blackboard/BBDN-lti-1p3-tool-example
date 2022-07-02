@@ -6,7 +6,6 @@ import uuid
 import requests
 from flask import render_template
 
-# TODO: encapsulate into a single responsibility area
 from app.models.jwt import LTIJwtPayload
 from app.models.state import LTIState
 from app.models.state import LTIStateStorage
@@ -67,6 +66,7 @@ def create_assignment(request):
 
 
 def get_assignment_content(name, points):
+    # Mock return value to simulate a assignment content item
     # Ideally we'd create an assignment in our database and create a content item with that unique identifier
     assignment_id = uuid.uuid4().hex
 
@@ -125,7 +125,7 @@ def submit_assignment(request):
     # Get Learn URL from the JWT
     line_item_url = jwt_request.endpoint_lineitem.rstrip("/")
 
-    # Construct payload for AGS call
+    # Construct payload for Learning Tools Interoperability (LTI) Assignment and Grade Services (AGS) call
     score_json = {
         "userId": jwt_request.sub,
         "scoreGiven": score,

@@ -139,5 +139,4 @@ def render_ui(jwt_request: LTIJwtPayload, state, id_token):
 def __log():
     return logging.getLogger("routes")
 
-
 init_logger("routes")
