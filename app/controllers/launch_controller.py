@@ -123,7 +123,7 @@ def render_ui(jwt_request: LTIJwtPayload, state, id_token):
             id_token=id_token,
             state=state,
             action_url=action_url,
-            course_name=jwt_request.payload["https://purl.imsglobal.org/spec/lti/claim/context"]["title"],
+            course_name=jwt_request.context_title,
             course_created=course_created_date,
         )
     else:

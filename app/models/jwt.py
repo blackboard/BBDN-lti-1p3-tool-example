@@ -20,6 +20,8 @@ class LTIJwtPayload(BaseModel):
     header: Optional[dict] = None
     payload: Optional[dict] = None
     aud: Optional[str] = None
+    context_id: Optional[str] = None
+    context_title: Optional[str] = None
     deep_linking_settings_data: Optional[str] = None
     deep_linking_settings_return_url: Optional[str] = None
     deployment_id: Optional[str] = None
@@ -53,6 +55,16 @@ class LTIJwtPayload(BaseModel):
             self.header = header
             self.payload = payload
             self.aud = self.__get_aud(payload)
+            self.context_id = (
+                payload["https://purl.imsglobal.org/spec/lti/claim/context"]["id"]
+                if "https://purl.imsglobal.org/spec/lti/claim/context" in payload
+                else ""
+            )
+            self.context_title = (
+                payload["https://purl.imsglobal.org/spec/lti/claim/context"]["title"]
+                if "https://purl.imsglobal.org/spec/lti/claim/context" in payload
+                else ""
+            )
             # https://www.imsglobal.org/spec/lti-dl/v2p0#deep-linking-request-message
             self.deep_linking_settings_data = (
                 payload["https://purl.imsglobal.org/spec/lti-dl/claim/deep_linking_settings"]["data"]
