@@ -20,13 +20,17 @@ class LTIJwtPayload(BaseModel):
     header: Optional[dict] = None
     payload: Optional[dict] = None
     aud: Optional[str] = None
+    deep_linking_settings_data: Optional[str] = None
+    deep_linking_settings_return_url: Optional[str] = None
     deployment_id: Optional[str] = None
+    endpoint_lineitem: Optional[str] = None
     iss: Optional[str] = None
     nonce: Optional[str] = None
+    platform_product_code: Optional[str] = None
     platform_url: Optional[str] = None
     sub: Optional[str] = None
     ttl: Optional[int] = 0
-    platform_product_code: Optional[str] = None
+    
 
     def __init__(self, token: Optional[str] = None, **kwargs):
         super().__init__(**kwargs)
@@ -48,6 +52,7 @@ class LTIJwtPayload(BaseModel):
             self.header = header
             self.payload = payload
             self.aud = self.__get_aud(payload)
+            # https://www.imsglobal.org/spec/lti-dl/v2p0#deep-linking-request-message
             self.deep_linking_settings_data = (
                 payload["https://purl.imsglobal.org/spec/lti-dl/claim/deep_linking_settings"]["data"]
                 if "https://purl.imsglobal.org/spec/lti-dl/claim/deep_linking_settings" in payload
@@ -61,6 +66,12 @@ class LTIJwtPayload(BaseModel):
             self.deployment_id = (
                 payload["https://purl.imsglobal.org/spec/lti/claim/deployment_id"]
                 if "https://purl.imsglobal.org/spec/lti/claim/deployment_id" in payload
+                else ""
+            )
+            # https://www.imsglobal.org/spec/lti-ags/v2p0/
+            self.endpoint_lineitem = (
+                payload["https://purl.imsglobal.org/spec/lti-ags/claim/endpoint"]["lineitem"]
+                if "https://purl.imsglobal.org/spec/lti-ags/claim/endpoint" in payload and "lineitem" in payload
                 else ""
             )
             self.iss = payload["iss"]

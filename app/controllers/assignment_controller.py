@@ -123,7 +123,8 @@ def submit_assignment(request):
         score += 30
 
     # Get Learn URL
-    line_item_url = jwt_request.payload["https://purl.imsglobal.org/spec/lti-ags/claim/endpoint"]["lineitem"].rstrip(
+    # https://www.imsglobal.org/spec/lti-ags/v2p0/
+    line_item_url = jwt_request.endpoint_lineitem.rstrip(
         "/"
     )
 
