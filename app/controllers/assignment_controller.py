@@ -14,7 +14,7 @@ from app.models.tool_config import LTITool
 from app.models.tool_config import LTIToolStorage
 
 
-def get_message_claims(payload, content_items) -> dict:
+def get_message_claims(jwt_request: LTIJwtPayload, content_items) -> dict:
     """
 
     :param payload:
@@ -22,17 +22,15 @@ def get_message_claims(payload, content_items) -> dict:
     :return:
     """
 
-    deep_link = payload["https://purl.imsglobal.org/spec/lti-dl/claim/deep_linking_settings"]
+    deep_link = jwt_request.payload["https://purl.imsglobal.org/spec/lti-dl/claim/deep_linking_settings"]
 
     claims = {
-        "iss": payload["aud"],
-        "aud": [payload["iss"]],
+        "iss": jwt_request.aud,
+        "aud": [jwt_request.iss],
         "exp": int(time.time()) + 600,
         "iat": int(time.time()),
         "nonce": "nonce-" + uuid.uuid4().hex,
-        "https://purl.imsglobal.org/spec/lti/claim/deployment_id": payload[
-            "https://purl.imsglobal.org/spec/lti/claim/deployment_id"
-        ],
+        "https://purl.imsglobal.org/spec/lti/claim/deployment_id": jwt_request.deployment_id,
         "https://purl.imsglobal.org/spec/lti/claim/message_type": "LtiDeepLinkingResponse",
         "https://purl.imsglobal.org/spec/lti/claim/version": "1.3.0",
         "https://purl.imsglobal.org/spec/lti-dl/claim/content_items": content_items,
@@ -59,7 +57,7 @@ def create_assignment(request):
         "deep_link_return_url"
     ]
 
-    deep_link_jwt = get_message_claims(jwt_request.payload, content)
+    deep_link_jwt = get_message_claims(jwt_request, content)
 
     jwt = LTIJwtPayload()
     jwtstring = jwt.encode(payload=deep_link_jwt, tool=lti_tool)
