@@ -62,7 +62,7 @@ class TokenClient:
         )
 
         print("[auth:setToken()] STATUS CODE: " + str(r.status_code))
-        # strip quotes from result for better dumps
+        # load the response as a json object
         res = json.loads(r.text)
         print("[auth:setToken()] RESPONSE: \n" + json.dumps(res, indent=4, separators=(",", ": ")))
 
@@ -109,10 +109,8 @@ class TokenClient:
         if not r.ok:
             msg = f"Error retrieving access token from platfom {platform.config.auth_token_url}. {r.reason}: {r.text}"
             logging.error(msg)
-            # TODO: uncomment
-            # raise Exception(msg)
-            return "not_a_real_token"
-
+            raise Exception(msg)
+        
         # access token (bearer token) to be used to communicate with the Provider (LMS)
         access_token = r.json()["access_token"]
         return access_token
