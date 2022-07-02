@@ -55,17 +55,18 @@ class LTIJwtPayload(BaseModel):
             )
             self.iss = payload["iss"]
             self.nonce = payload["nonce"]
+            self.platform_product_code = (
+                payload["https://purl.imsglobal.org/spec/lti/claim/tool_platform"]["product_family_code"]
+                if "https://purl.imsglobal.org/spec/lti/claim/tool_platform" in payload
+                else ""
+            )
             self.platform_url = (
                 payload["https://purl.imsglobal.org/spec/lti/claim/tool_platform"]["url"]
                 if "https://purl.imsglobal.org/spec/lti/claim/tool_platform" in payload
                 else ""
             )
             self.sub = payload["sub"]
-            self.platform_product_code = (
-                payload["https://purl.imsglobal.org/spec/lti/claim/tool_platform"]["product_family_code"]
-                if "https://purl.imsglobal.org/spec/lti/claim/tool_platform" in payload
-                else ""
-            )
+
         else:
             self.__log().debug("no params")
 

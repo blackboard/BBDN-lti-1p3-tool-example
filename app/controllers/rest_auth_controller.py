@@ -19,7 +19,7 @@ def authcode(request):
 
     # Get the Learn access token
     if "BlackboardLearn" == jwt_request.platform_product_code:
-        learn_url = jwt_request.payload["https://purl.imsglobal.org/spec/lti/claim/tool_platform"]["url"].rstrip("/")
+        learn_url = jwt_request.platform_url.rstrip("/")
         learn_access_token = TokenClient().get_learn_access_token(learn_url, auth_code_url, auth_code)
         # Cache the REST access token
         state.record.set_platform_learn_rest_token(learn_access_token)

@@ -85,9 +85,7 @@ def launch(request):
         encoded_params = urlencode(params)
         # 3LO
         if "BlackboardLearn" == jwt_request.platform_product_code:
-            learn_url = jwt_request.payload["https://purl.imsglobal.org/spec/lti/claim/tool_platform"]["url"].rstrip(
-                "/"
-            )
+            learn_url = jwt_request.platform_url.rstrip("/")
             one_time_session_token = jwt_request.payload["https://blackboard.com/lti/claim/one_time_session_token"]
             auth_code_url = f"{learn_url}/learn/api/public/v1/oauth2/authorizationcode?{encoded_params}&one_time_session_token={one_time_session_token}"
             return redirect(auth_code_url)

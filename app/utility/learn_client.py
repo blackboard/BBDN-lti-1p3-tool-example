@@ -24,10 +24,10 @@ class LearnClient:
         return logging.getLogger("LearnClient")
 
     @staticmethod
-    def get_course_info(jwt_request, request_cookie_state):
+    def get_course_info(jwt_request: LTIJwtPayload, request_cookie_state):
         state: LTIState = LTIState(LTIStateStorage()).load(request_cookie_state)
         learn_access_token = state.record.get_platform_learn_rest_token()
-        learn_url = jwt_request.payload["https://purl.imsglobal.org/spec/lti/claim/tool_platform"]["url"].rstrip("/")
+        learn_url = jwt_request.platform_url.rstrip("/")
         course_uuid = jwt_request.payload["https://purl.imsglobal.org/spec/lti/claim/context"]["id"]
         headers = {"Authorization": f"Bearer {learn_access_token}"}
         course_info_url = f"{learn_url}/learn/api/public/v2/courses/uuid:{course_uuid}"
