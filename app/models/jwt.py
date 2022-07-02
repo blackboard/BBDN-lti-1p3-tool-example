@@ -48,6 +48,16 @@ class LTIJwtPayload(BaseModel):
             self.header = header
             self.payload = payload
             self.aud = self.__get_aud(payload)
+            self.deep_linking_settings_data = (
+                payload["https://purl.imsglobal.org/spec/lti-dl/claim/deep_linking_settings"]["data"]
+                if "https://purl.imsglobal.org/spec/lti-dl/claim/deep_linking_settings" in payload
+                else ""
+            )
+            self.deep_linking_settings_return_url = (
+                payload["https://purl.imsglobal.org/spec/lti-dl/claim/deep_linking_settings"]["deep_link_return_url"]
+                if "https://purl.imsglobal.org/spec/lti-dl/claim/deep_linking_settings" in payload
+                else ""
+            )
             self.deployment_id = (
                 payload["https://purl.imsglobal.org/spec/lti/claim/deployment_id"]
                 if "https://purl.imsglobal.org/spec/lti/claim/deployment_id" in payload

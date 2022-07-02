@@ -21,9 +21,6 @@ def get_message_claims(jwt_request: LTIJwtPayload, content_items) -> dict:
     :param content_items:
     :return:
     """
-
-    deep_link = jwt_request.payload["https://purl.imsglobal.org/spec/lti-dl/claim/deep_linking_settings"]
-
     claims = {
         "iss": jwt_request.aud,
         "aud": [jwt_request.iss],
@@ -34,7 +31,7 @@ def get_message_claims(jwt_request: LTIJwtPayload, content_items) -> dict:
         "https://purl.imsglobal.org/spec/lti/claim/message_type": "LtiDeepLinkingResponse",
         "https://purl.imsglobal.org/spec/lti/claim/version": "1.3.0",
         "https://purl.imsglobal.org/spec/lti-dl/claim/content_items": content_items,
-        "https://purl.imsglobal.org/spec/lti-dl/claim/data": deep_link["data"],
+        "https://purl.imsglobal.org/spec/lti-dl/claim/data": jwt_request.deep_linking_settings_data,
     }
     return claims
 
@@ -53,10 +50,7 @@ def create_assignment(request):
 
     content = get_assignment_content(name, points)
 
-    return_url = jwt_request.payload["https://purl.imsglobal.org/spec/lti-dl/claim/deep_linking_settings"][
-        "deep_link_return_url"
-    ]
-
+    return_url = jwt_request.deep_linking_settings_return_url
     deep_link_jwt = get_message_claims(jwt_request, content)
 
     jwt = LTIJwtPayload()
