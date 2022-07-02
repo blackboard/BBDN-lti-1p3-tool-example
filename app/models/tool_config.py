@@ -59,8 +59,8 @@ class LTITool:
             else:
                 raise Exception("InvalidParameterException")
         except botocore.exceptions.ClientError as error:
-            msg = f"Retrieving parameter {os.getenv('lti_tooling_api_url_key')} from SSM. {error}"
-            self.__log().error()
+            msg = f"Retrieving parameter {os.getenv('LTI_TOOLING_API_URL_KEY')} from SSM. {error}"
+            self.__log().error(msg)
             raise Exception(msg)
 
     def __get_learn_app_key(self):

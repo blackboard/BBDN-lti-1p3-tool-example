@@ -90,6 +90,6 @@ class LTIPlatform:
             self._storage.ddbclient.put_item(TableName=self._storage.TABLE_NAME, Item=item)
         except botocore.exceptions.ClientError as error:
             msg = f"Error persisting PlatformConfig for {self.config.PK}. {json.dumps(error)}"
-            self.__log().error()
+            self.__log().error(msg)
             raise Exception(msg)
         return self
