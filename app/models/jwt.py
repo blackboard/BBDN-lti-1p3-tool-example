@@ -25,6 +25,7 @@ class LTIJwtPayload(BaseModel):
     deployment_id: Optional[str] = None
     endpoint_lineitem: Optional[str] = None
     iss: Optional[str] = None
+    message_type: Optional[str] = None
     nonce: Optional[str] = None
     platform_product_code: Optional[str] = None
     platform_url: Optional[str] = None
@@ -75,6 +76,11 @@ class LTIJwtPayload(BaseModel):
                 else ""
             )
             self.iss = payload["iss"]
+            self.message_type = (
+                payload["https://purl.imsglobal.org/spec/lti/claim/message_type"]
+                if "https://purl.imsglobal.org/spec/lti/claim/message_type" in payload
+                else ""
+            )
             self.nonce = payload["nonce"]
             self.platform_product_code = (
                 payload["https://purl.imsglobal.org/spec/lti/claim/tool_platform"]["product_family_code"]

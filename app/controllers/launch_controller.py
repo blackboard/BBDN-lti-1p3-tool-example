@@ -95,7 +95,7 @@ def launch(request):
         abort(500, e)
 
 
-def render_ui(jwt_request, state, id_token):
+def render_ui(jwt_request: LTIJwtPayload, state, id_token):
     pretty_body = json.dumps(jwt_request.payload, sort_keys=True, indent=2, separators=(",", ": "))
 
     # Get the user's name; they might not have a "full name"
@@ -114,7 +114,7 @@ def render_ui(jwt_request, state, id_token):
         if "created" in course_info:
             course_created_date = course_info["created"]
 
-    if jwt_request.payload["https://purl.imsglobal.org/spec/lti/claim/message_type"] == "LtiResourceLinkRequest":
+    if jwt_request.message_type == "LtiResourceLinkRequest":
         action_url = f"{tool.config.base_url()}/submit_assignment"
         return render_template(
             "knowledge_check.html",
