@@ -122,11 +122,8 @@ def submit_assignment(request):
     if question3 == "on":
         score += 30
 
-    # Get Learn URL
-    # https://www.imsglobal.org/spec/lti-ags/v2p0/
-    line_item_url = jwt_request.endpoint_lineitem.rstrip(
-        "/"
-    )
+    # Get Learn URL from the JWT
+    line_item_url = jwt_request.endpoint_lineitem.rstrip("/")
 
     # Construct payload for AGS call
     score_json = {

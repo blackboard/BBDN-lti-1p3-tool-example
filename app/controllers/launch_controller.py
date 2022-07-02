@@ -67,26 +67,25 @@ def launch(request):
         # Save the token on the State record
         state.save()
 
-        ##################
-        # Learn REST access token for accessing the Learn REST API: Authorization Code grant
-        # https://developer.blackboard.com/portal/displayApi/
-        # https://www.oauth.com/oauth2-servers/access-tokens/authorization-code-request/
-        ##################
-        # get a Learn REST access token via 3LO flow
-
-        params = {
-            "redirect_uri": lti_tool.config.auth_code_url(),
-            "response_type": "code",
-            "client_id": lti_tool.config.learn_app_key,  # despite the naming this is the Learn Application Key
-            "scope": "*",
-            "state": request_post_state,
-        }
-
-        encoded_params = urlencode(params)
-        # 3LO
+        # Blackboard Three-Legged OAuth (3LO) for Learn REST API
         if "BlackboardLearn" == jwt_request.platform_product_code:
+            ##################
+            # Learn REST access token for accessing the Learn REST API: Authorization Code grant
+            # https://docs.blackboard.com/rest-apis/learn/getting-started/3lo
+            # https://developer.blackboard.com/portal/displayApi/
+            # https://www.oauth.com/oauth2-servers/access-tokens/authorization-code-request/
+            ##################
+            params = {
+                "redirect_uri": lti_tool.config.auth_code_url(),
+                "response_type": "code",
+                "client_id": lti_tool.config.learn_app_key,  # despite the naming this is the Learn Application Key
+                "scope": "*",
+                "state": request_post_state,
+            }
+            encoded_params = urlencode(params)
+
             learn_url = jwt_request.platform_url.rstrip("/")
-            one_time_session_token = jwt_request.payload["https://blackboard.com/lti/claim/one_time_session_token"]
+            one_time_session_token = jwt_request.one_time_session_token
             auth_code_url = f"{learn_url}/learn/api/public/v1/oauth2/authorizationcode?{encoded_params}&one_time_session_token={one_time_session_token}"
             return redirect(auth_code_url)
         else:

@@ -29,6 +29,7 @@ class LTIJwtPayload(BaseModel):
     iss: Optional[str] = None
     message_type: Optional[str] = None
     nonce: Optional[str] = None
+    one_time_session_token: Optional[str] = None
     platform_product_code: Optional[str] = None
     platform_url: Optional[str] = None
     sub: Optional[str] = None
@@ -94,6 +95,11 @@ class LTIJwtPayload(BaseModel):
                 else ""
             )
             self.nonce = payload["nonce"]
+            self.one_time_session_token = (
+                payload["https://blackboard.com/lti/claim/one_time_use_token"]
+                if "https://blackboard.com/lti/claim/one_time_use_token" in payload
+                else ""
+            )
             self.platform_product_code = (
                 payload["https://purl.imsglobal.org/spec/lti/claim/tool_platform"]["product_family_code"]
                 if "https://purl.imsglobal.org/spec/lti/claim/tool_platform" in payload
