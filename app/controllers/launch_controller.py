@@ -64,7 +64,7 @@ def launch(request):
         lti_tool = LTITool(LTIToolStorage())
         # Reqest an access token for use for LTI 1.3 based Tool Originating Messages
         lti_token = TokenClient().request_bearer_token(
-            platform=platform, grantType=GrantType.client_credentials, tool=lti_tool
+            platform=platform, grantType=GrantType.CLIENT_CREDENTIALS, tool=lti_tool
         )
 
         # Add the access token to the user's State record (convenience method to encryption)
