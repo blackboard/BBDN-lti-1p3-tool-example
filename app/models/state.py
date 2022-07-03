@@ -30,7 +30,7 @@ class LTIStateRecord(BaseModel):
         try:
             return CryptographyClient.decrypt_string(self.platform_lti_token)
         except Exception as e:
-            logging.error(f"Error encrypting platform LTI token: {e}")
+            logging.error(f"Error decrypting platform LTI token: {e}")
             raise e
 
     def set_platform_lti_token(self, new_platform_lti_token):
@@ -44,7 +44,7 @@ class LTIStateRecord(BaseModel):
         try:
             return CryptographyClient.decrypt_string(self.learn_rest_token)
         except Exception as e:
-            logging.error(f"Error encrypting platform Learn REST token: {e}")
+            logging.error(f"Error decrypting platform Learn REST token: {e}")
             raise e
 
     def set_platform_learn_rest_token(self, new_learn_rest_token):
