@@ -10,7 +10,6 @@ from app.models.jwks import JwkStorage
 from app.utility import init_logger
 from app.utility.aws import Aws
 
-
 class LTIToolConfig(BaseModel):
     url: str
     learn_app_key: Optional[str] = None
@@ -25,7 +24,6 @@ class LTIToolConfig(BaseModel):
     def base_url(self) -> str:
         return self.url.rstrip("/")
 
-
 class LTIToolStorage:
     def __init__(self):
         aws = Aws()
@@ -35,7 +33,6 @@ class LTIToolStorage:
         if not hasattr(cls, "instance"):
             cls.instance = super(LTIToolStorage, cls).__new__(cls)
         return cls.instance
-
 
 class LTITool:
     def __init__(self, lti_storage: LTIToolStorage):
@@ -47,6 +44,18 @@ class LTITool:
             learn_app_secret=self.__get_learn_app_secret(),
         )
         self.jwks = Jwk.all(JwkStorage())
+
+    def set_learn_app_key_and_secret(self, key: str, secret: str):
+        self.__set_learn_app_key(key)
+        self.__set_learn_app_secret(secret)
+        return LTITool(lti_storage=self._storage)
+
+    def tool_kids(self):
+        kids = []
+        sorted_keys = sorted(self.jwks["keys"], key=lambda x: x["ttl"], reverse=True)
+        for key in sorted_keys:
+            kids.append(key["kid"])
+        return kids
 
     def __log(self):
         return logging.getLogger("LTIPlatform")
@@ -60,23 +69,11 @@ class LTITool:
     def __get_learn_app_secret(self):
         return self.__get_secret_value(os.getenv("LEARN_APPLICATION_SECRET_KEY"), True)
 
-    def set_learn_app_key_and_secret(self, key: str, secret: str):
-        self.__set_learn_app_key(key)
-        self.__set_learn_app_secret(secret)
-        return LTITool(lti_storage=self._storage)
-
     def __set_learn_app_secret(self, secret: str):
         self.__set_secret_value(os.getenv("LEARN_APPLICATION_SECRET_KEY"), secret, True)
 
     def __set_learn_app_key(self, key: str):
         self.__set_secret_value(os.getenv("LEARN_APPLICATION_KEY_KEY"), key, False)
-
-    def tool_kids(self):
-        kids = []
-        sorted_keys = sorted(self.jwks["keys"], key=lambda x: x["ttl"], reverse=True)
-        for key in sorted_keys:
-            kids.append(key["kid"])
-        return kids
 
     def __get_secret_value(self, secret_name: str, with_encryption: bool) -> str:
         try:
