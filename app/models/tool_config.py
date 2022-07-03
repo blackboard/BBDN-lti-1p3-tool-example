@@ -52,50 +52,13 @@ class LTITool:
         return logging.getLogger("LTIPlatform")
 
     def __get_url(self):
-        try:
-            response = self._storage.ssm_client.get_parameter(Name=os.getenv("LTI_TOOLING_API_URL_KEY"))
-            if response and "Parameter" in response and "Value" in response["Parameter"]:
-                return response["Parameter"]["Value"]
-            else:
-                raise Exception("InvalidParameterException")
-        except botocore.exceptions.ClientError as error:
-            msg = f"Retrieving parameter {os.getenv('LTI_TOOLING_API_URL_KEY')} from SSM. {error}"
-            self.__log().error(msg)
-            raise Exception(msg)
+        return self.__get_secret_value(os.getenv("LTI_TOOLING_API_URL_KEY"), False)
 
     def __get_learn_app_key(self):
-        try:
-            response = self._storage.ssm_client.get_parameter(Name=os.getenv("LEARN_APPLICATION_KEY_KEY"))
-            if response and "Parameter" in response and "Value" in response["Parameter"]:
-                return response["Parameter"]["Value"]
-            else:
-                raise Exception("InvalidParameterException")
-        except botocore.exceptions.ClientError as error:
-            if error.response["Error"]["Code"] == "ParameterNotFound":
-                self.__log().warning(f"{os.getenv('LEARN_APPLICATION_KEY_KEY')} not found in SSM")
-                return None
-            else:
-                msg = f"Retrieving parameter {os.getenv('LEARN_APPLICATION_KEY_KEY')} from SSM. {error}"
-                self.__log().error(msg)
-                raise Exception(msg)
+        return self.__get_secret_value(os.getenv("LEARN_APPLICATION_KEY_KEY"), False)
 
     def __get_learn_app_secret(self):
-        try:
-            response = self._storage.ssm_client.get_parameter(
-                Name=os.getenv("LEARN_APPLICATION_SECRET_KEY"), WithDecryption=True
-            )
-            if response and "Parameter" in response and "Value" in response["Parameter"]:
-                return response["Parameter"]["Value"]
-            else:
-                raise Exception("InvalidParameterException")
-        except botocore.exceptions.ClientError as error:
-            if error.response["Error"]["Code"] == "ParameterNotFound":
-                self.__log().warning(f"{os.getenv('LEARN_APPLICATION_SECRET_KEY')} not found in SSM")
-                return None
-            else:
-                msg = f"Retrieving parameter {os.getenv('LEARN_APPLICATION_SECRET_KEY')} from SSM. {error}"
-                self.__log().error(msg)
-                raise Exception(msg)
+        return self.__get_secret_value(os.getenv("LEARN_APPLICATION_SECRET_KEY"), True)
 
     def set_learn_app_key_and_secret(self, key: str, secret: str):
         self.__set_learn_app_key(key)
@@ -103,32 +66,10 @@ class LTITool:
         return LTITool(lti_storage=self._storage)
 
     def __set_learn_app_secret(self, secret: str):
-        try:
-            self._storage.ssm_client.put_parameter(
-                Name=os.getenv("LEARN_APPLICATION_SECRET_KEY"),
-                Type="SecureString",
-                Overwrite=True,
-                Value=secret,
-            )
-
-        except botocore.exceptions.ClientError as error:
-            msg = f"Saving parameter {os.getenv('LEARN_APPLICATION_SECRET_KEY')} to SSM. {error}"
-            self.__log().error()
-            raise Exception(msg)
+        self.__set_secret_value(os.getenv("LEARN_APPLICATION_SECRET_KEY"), secret, True)
 
     def __set_learn_app_key(self, key: str):
-        try:
-            self._storage.ssm_client.put_parameter(
-                Name=os.getenv("LEARN_APPLICATION_KEY_KEY"),
-                Type="String",
-                Overwrite=True,
-                Value=key,
-            )
-
-        except botocore.exceptions.ClientError as error:
-            msg = f"Saving parameter {os.getenv('LEARN_APPLICATION_KEY_KEY')} to SSM. {error}"
-            self.__log().error()
-            raise Exception(msg)
+        self.__set_secret_value(os.getenv("LEARN_APPLICATION_KEY_KEY"), key, False)
 
     def tool_kids(self):
         kids = []
@@ -136,3 +77,35 @@ class LTITool:
         for key in sorted_keys:
             kids.append(key["kid"])
         return kids
+
+    def __get_secret_value(self, secret_name: str, with_encryption: bool) -> str:
+        try:
+            response = self._storage.ssm_client.get_parameter(
+                Name=secret_name, WithDecryption=with_encryption
+            )
+            if response and "Parameter" in response and "Value" in response["Parameter"]:
+                return response["Parameter"]["Value"]
+            else:
+                raise Exception("InvalidParameterException")
+        except botocore.exceptions.ClientError as error:
+            if error.response["Error"]["Code"] == "ParameterNotFound":
+                self.__log().warning(f"{secret_name} not found in SSM")
+                return None
+            else:
+                msg = f"Retrieving parameter {secret_name} from SSM. {error}"
+                self.__log().error(msg)
+                raise Exception(msg)
+
+    def __set_secret_value(self, secret_name: str, secret: str, with_encryption: bool):
+        try:
+            self._storage.ssm_client.put_parameter(
+                Name=secret_name,
+                Type="SecureString" if with_encryption == True else "String",
+                Overwrite=True,
+                Value=secret,
+            )
+        except botocore.exceptions.ClientError as error:
+            msg = f"Saving parameter {secret_name} to SSM. {error}"
+            self.__log().error()
+            raise Exception(msg)
+            

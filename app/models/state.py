@@ -77,34 +77,28 @@ class LTIState:
         if self.record.id is None or nonce is None:
             self.__log().error(f"id={self.record.id},nonce={nonce}")
             raise Exception("InvalidParameterException")
-        try:
 
-            if self.record.nonce == nonce and self.record.nonce_count == 0:
-                try:
-                    self._storage.ddbclient.update_item(
-                        TableName=self._storage.TABLE_NAME,
-                        Key={"PK": {"S": f"STATE#{self.record.id}"}},
-                        UpdateExpression="ADD nonce_count :inc",
-                        ConditionExpression="nonce = :nonce AND nonce_count = :nonce_count",
-                        ExpressionAttributeValues={
-                            ":inc": {"N": "1"},
-                            ":nonce": {"S": self.record.nonce},
-                            ":nonce_count": {"N": "0"},
-                        },
-                    )
-                    return True
-                except botocore.exceptions.ClientError as error:
-                    msg = f"Error persisting State record for STATE#{self.record.id}. {json.dumps(error)}"
-                    self.__log().error(msg)
-                    raise Exception(msg)
-
-            else:
-                self.__log().warning("Invalid state")
-                return False
-        except botocore.exceptions.ClientError as error:
-            msg = f"Error retrieving State for STATE#{self.record.id}. {json.dumps(error)}"
-            self.__log().error(msg)
-            raise Exception(msg)
+        if self.record.nonce != nonce and self.record.nonce_count != 0:
+            self.__log().warning("Invalid state")
+            return False
+        else:
+            try:
+                self._storage.ddbclient.update_item(
+                    TableName=self._storage.TABLE_NAME,
+                    Key={"PK": {"S": f"STATE#{self.record.id}"}},
+                    UpdateExpression="ADD nonce_count :inc",
+                    ConditionExpression="nonce = :nonce AND nonce_count = :nonce_count",
+                    ExpressionAttributeValues={
+                        ":inc": {"N": "1"},
+                        ":nonce": {"S": self.record.nonce},
+                        ":nonce_count": {"N": "0"},
+                    },
+                )
+                return True
+            except botocore.exceptions.ClientError as error:
+                msg = f"Error persisting State record for STATE#{self.record.id}. {json.dumps(error)}"
+                self.__log().error(msg)
+                raise Exception(msg)
 
     def __log(self):
         return logging.getLogger("LTIPlatform")
