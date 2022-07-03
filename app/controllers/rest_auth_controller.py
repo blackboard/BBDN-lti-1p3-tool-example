@@ -18,7 +18,7 @@ def authcode(request):
     auth_code_url = lti_tool.config.auth_code_url()
 
     # Get the Learn access token
-    if "BlackboardLearn" == jwt_request.platform_product_code:
+    if jwt_request.platform_product_code == "BlackboardLearn":
         learn_url = jwt_request.platform_url.rstrip("/")
         learn_access_token = TokenClient().get_learn_access_token(learn_url, auth_code_url, auth_code)
         # Cache the REST access token

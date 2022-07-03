@@ -51,24 +51,29 @@ def launch(request):
         except Exception as e:
             abort(401, e)
 
+        # Load the user's State record
         state: LTIState = LTIState(LTIStateStorage()).load(request_cookie_state)
         # Validate the state and nonce
         if not state.validate(jwt_request.nonce):
             abort(409, "InvalidParameterException - Unable to verify State")
+        
+        # Add the id_token (JWT) to the user's State record
+        state.record.id_token = id_token
+
+        # Load the global config for this Tool
         lti_tool = LTITool(LTIToolStorage())
-        # Get the LTI 1.3 access token for use for LTI based Tool Originating Messages
+        # Reqest an access token for use for LTI 1.3 based Tool Originating Messages
         lti_token = TokenClient().request_bearer_token(
             platform=platform, grantType=GrantType.client_credentials, tool=lti_tool
         )
 
-        # Using convenience method to encrypt the platform LTI access token before saving
+        # Add the access token to the user's State record (convenience method to encryption)
         state.record.set_platform_lti_token(lti_token)
-        state.record.id_token = id_token
-        # Save the token on the State record
+        # Save the user's State record
         state.save()
 
         # Blackboard Three-Legged OAuth (3LO) for Learn REST API
-        if "BlackboardLearn" == jwt_request.platform_product_code:
+        if jwt_request.platform_product_code == "BlackboardLearn":
             ##################
             # Learn REST access token for accessing the Learn REST API: Authorization Code grant
             # https://docs.blackboard.com/rest-apis/learn/getting-started/3lo
@@ -108,7 +113,7 @@ def render_ui(jwt_request: LTIJwtPayload, state, id_token):
     tool = LTITool(LTIToolStorage())
 
     course_created_date = ""
-    if "BlackboardLearn" == jwt_request.platform_product_code:
+    if jwt_request.platform_product_code == "BlackboardLearn":
         course_info = LearnClient().get_course_info(jwt_request, state)
         if "created" in course_info:
             course_created_date = course_info["created"]
@@ -135,8 +140,3 @@ def render_ui(jwt_request: LTIJwtPayload, state, id_token):
             action_url=action_url,
         )
 
-
-def __log():
-    return logging.getLogger("routes")
-
-init_logger("routes")

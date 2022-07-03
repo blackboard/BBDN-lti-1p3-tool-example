@@ -71,7 +71,7 @@ class LTITool:
             else:
                 raise Exception("InvalidParameterException")
         except botocore.exceptions.ClientError as error:
-            if "ParameterNotFound" == error.response["Error"]["Code"]:
+            if error.response["Error"]["Code"] == "ParameterNotFound":
                 self.__log().warning(f"{os.getenv('LEARN_APPLICATION_KEY_KEY')} not found in SSM")
                 return None
             else:
@@ -89,7 +89,7 @@ class LTITool:
             else:
                 raise Exception("InvalidParameterException")
         except botocore.exceptions.ClientError as error:
-            if "ParameterNotFound" == error.response["Error"]["Code"]:
+            if error.response["Error"]["Code"] == "ParameterNotFound":
                 self.__log().warning(f"{os.getenv('LEARN_APPLICATION_SECRET_KEY')} not found in SSM")
                 return None
             else:
