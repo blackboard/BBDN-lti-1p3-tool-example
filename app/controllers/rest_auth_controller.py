@@ -1,3 +1,5 @@
+from flask import abort
+
 from app.controllers import launch_controller
 from app.models.jwt import LTIJwtPayload
 from app.models.state import LTIStateStorage, LTIState
@@ -9,6 +11,12 @@ from app.utility.token_client import TokenClient
 def authcode(request):
     auth_code = request.args.get("code", "")
     request_cookie_state = request.cookies.get("state")
+
+    if not auth_code:
+        abort(400, "InvalidParameterException - Missing auth code")
+    if not request_cookie_state:
+        abort(400, "InvalidParameterException - Missing state")
+
     state: LTIState = LTIState(LTIStateStorage()).load(request_cookie_state)
 
     id_token = state.record.id_token
