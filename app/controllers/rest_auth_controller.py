@@ -22,18 +22,21 @@ def authcode(request):
     if not state:
         abort(409, "InvalidParameterException - State not found")
 
-    id_token = state.record.id_token
-    jwt_request = LTIJwtPayload(id_token)
+    try:
+        id_token = state.record.id_token
+        jwt_request = LTIJwtPayload(id_token)
 
-    lti_tool = LTITool(LTIToolStorage())
-    auth_code_url = lti_tool.config.auth_code_url()
+        lti_tool = LTITool(LTIToolStorage())
+        auth_code_url = lti_tool.config.auth_code_url()
 
-    # Get the Learn access token
-    if jwt_request.platform_product_code == "BlackboardLearn":
-        learn_url = jwt_request.platform_url.rstrip("/")
-        learn_access_token = TokenClient().get_learn_access_token(learn_url, auth_code_url, auth_code)
-        # Cache the REST access token
-        state.record.set_platform_learn_rest_token(learn_access_token)
-        state.save()
+        # Get the Learn access token
+        if jwt_request.platform_product_code == "BlackboardLearn":
+            learn_url = jwt_request.platform_url.rstrip("/")
+            learn_access_token = TokenClient().get_learn_access_token(learn_url, auth_code_url, auth_code)
+            # Cache the REST access token
+            state.record.set_platform_learn_rest_token(learn_access_token)
+            state.save()
 
-    return launch_controller.render_ui(jwt_request, request_cookie_state, id_token)
+        return launch_controller.render_ui(jwt_request, request_cookie_state, id_token)
+    except Exception as e:
+        abort(500, e)
