@@ -19,6 +19,9 @@ def authcode(request):
 
     state: LTIState = LTIState(LTIStateStorage()).load(request_cookie_state)
 
+    if not state:
+        abort(409, "InvalidParameterException - State not found")
+
     id_token = state.record.id_token
     jwt_request = LTIJwtPayload(id_token)
 
