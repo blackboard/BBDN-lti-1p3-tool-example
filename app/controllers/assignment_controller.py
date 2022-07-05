@@ -28,7 +28,6 @@ def submit_assignment(request):
         abort(400, "InvalidParameterException - Missing state")
 
     state: LTIState = LTIState(LTIStateStorage()).load(request_cookie_state)
-
     if not state:
         abort(409, "InvalidParameterException - State not found")
 
@@ -77,9 +76,14 @@ def create_assignment(request):
     name = request.form.get("name")
     points = request.form.get("points")
     id_token = request.form.get("id_token")
+    request_cookie_state = request.form.get("state")
 
     if not name or not points or not id_token:
         abort(400, "InvalidParameterException - Missing required parameter")
+
+    state: LTIState = LTIState(LTIStateStorage()).load(request_cookie_state)
+    if not state:
+        abort(409, "InvalidParameterException - State not found")
 
     try:
         jwt_request = LTIJwtPayload(id_token)
@@ -88,12 +92,12 @@ def create_assignment(request):
         content = get_assignment_content(name, points)
 
         return_url = jwt_request.deep_linking_settings_return_url
-        deep_link_jwt = get_message_claims(jwt_request, content)
+        deep_link_claims = get_message_claims(jwt_request, content)
 
         jwt = LTIJwtPayload()
-        jwtstring = jwt.encode(payload=deep_link_jwt, tool=lti_tool)
+        jwtstring = jwt.encode(payload=deep_link_claims, tool=lti_tool)
 
-        pretty_body = json.dumps(deep_link_jwt, sort_keys=True, indent=2, separators=(",", ": "))
+        pretty_body = json.dumps(deep_link_claims, sort_keys=True, indent=2, separators=(",", ": "))
 
         return render_template(
             "confirm_assignment.html",

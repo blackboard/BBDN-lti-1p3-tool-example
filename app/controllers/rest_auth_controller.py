@@ -18,7 +18,6 @@ def authcode(request):
         abort(400, "InvalidParameterException - Missing state")
 
     state: LTIState = LTIState(LTIStateStorage()).load(request_cookie_state)
-
     if not state:
         abort(409, "InvalidParameterException - State not found")
 
