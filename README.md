@@ -2,7 +2,7 @@
 
 This is an LTI tool allow an instructor to create an assessment, and allow students to complete the assessment and get a grade
 
-#### Prerequisites
+## Prerequisites
 
 - [AWS Command Line Interface](https://aws.amazon.com/cli/)
 - [AWS CDK](https://docs.aws.amazon.com/cdk/latest/guide/getting_started.html#getting_started_install)
@@ -15,7 +15,7 @@ To create a virtualenv on MacOS and Linux:
 $ poetry install
 ```
 
-Drop into the python virtual env
+Drop into the python virtual env:
 
 ```
 $ poetry shell
@@ -23,27 +23,27 @@ $ poetry shell
 
 ## Deployment
 
-Export your AWS account and region where the stacks will be deployed
+Export your AWS account and region where the stacks will be deployed.
 
 ```
 $ export AWS_DEFAULT_ACCOUNT=<YOUR_ACCOUNT_NUMBER>
 $ export AWS_DEFAULT_REGION=<YOUR_AWS_REGION>
 ```
 
-If you haven't already be sure to bootstrap your cdk environment. This only needs to be done once.
+If you haven't already be sure to bootstrap your cdk environment. ***This only needs to be done once***.
 
 ```
 $ cdk bootstrap aws://$AWS_DEFAULT_ACCOUNT/$AWS_DEFAULT_REGION
 ```
 
-At this point you can now deploy the stacks to you AWS account
+At this point you can now deploy the stacks to you AWS account.
 
 ### pipeline-stack
 
-To deploy the pipeline issue the following command
+To deploy the pipeline issue the following command:
 
 ```
-$ cdk deploy -c account=$AWS_DEFAULT_ACCOUNT -c region=$AWS_DEFAULT_REGION -c repo=<THE_GITHUB_ORG>/<THE_GIT_HUB_REPOSITORY> -c branch=$(git rev-parse --abbrev-ref HEAD) -c codestar_connection_arn=<CODESTART_CONNECTION_ARN> -a "python pipeline.py pipeline-stack-$(git rev-parse --abbrev-ref HEAD | sed -e 's/\//-/g')
+$ cdk deploy -c account=$AWS_DEFAULT_ACCOUNT -c region=$AWS_DEFAULT_REGION -c repo=<THE_GITHUB_ORG>/<THE_GIT_HUB_REPOSITORY> -c branch=$(git rev-parse --abbrev-ref HEAD) -c codestar_connection_arn=<CODESTART_CONNECTION_ARN> -a "python pipeline.py pipeline-stack-$(git rev-parse --abbrev-ref HEAD | sed -e 's/\//-/g')"
 ```
 
 To complete the pipeline setup you must go into the AWS Console, navigate to CodePipeline, on the left hand side expand "Settings" and click "Connections"
@@ -74,33 +74,34 @@ Finally, click "Connect" to complete the connection setup
 
 ![Connection settings](./images/connections07.png)
 
-Once the connection to github is complete you can trigger the pipeline by checking code into the configured branch or manually triggering the pipeline by clicking the "Release change" button in the AWS Console
+Once the connection to github is complete you can trigger the pipeline by checking code into the configured branch or manually triggering the pipeline by clicking the "Release change" button in the AWS Console.
 
-You should deploy the pipeline stack first before
+You should deploy the pipeline stack first before.
 
 ### application-stack
 
-To deploy the application directly without a pipeline issue this command
+To deploy the application directly without a pipeline issue this command:
 
 ```
 $ cdk deploy -c account=$AWS_DEFAULT_ACCOUNT -c region=$AWS_DEFAULT_REGION -c repo=<THE_GITHUB_ORG>/<THE_GIT_HUB_REPOSITORY> -c branch=$(git rev-parse --abbrev-ref HEAD) -c codestar_connection_arn=<CODESTART_CONNECTION_ARN> application-stack-$(git rev-parse --abbrev-ref HEAD | sed -e 's/\//-/g')
 ```
 
-You can also run locally using the following command
+You can also run [localy](#configuring-local-environment) using the following command:
 
 ```
 $ flask run
 ```
 
-To update things if a dependency has changed run
+To update things if a dependency has changed run:
 
 ```
 poetry update
 ```
 
-### Configuration
+## Configuring local environment
 
-If you want to run locally via `flask run` you'll need to set some environment variables. It's best to create a `.env` (or `.envrc` if using direnv) file.
+In order to run the tool locally via `flask run` you'll need to configure a set of environment variables. It's best 
+to create a `.env` (or `.envrc` if using direnv) file.
 These are the possible values you can change:
 
 ````
