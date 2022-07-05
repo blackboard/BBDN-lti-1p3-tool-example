@@ -4,6 +4,7 @@ import time
 import uuid
 
 import requests
+from flask import abort
 from flask import render_template
 
 from app.models.jwt import LTIJwtPayload
@@ -13,57 +14,96 @@ from app.models.tool_config import LTITool
 from app.models.tool_config import LTIToolStorage
 
 
-def get_message_claims(jwt_request: LTIJwtPayload, content_items) -> dict:
-    """
+def submit_assignment(request):
 
-    :param payload:
-    :param content_items:
-    :return:
-    """
-    claims = {
-        "iss": jwt_request.aud,
-        "aud": [jwt_request.iss],
-        "exp": int(time.time()) + 600,
-        "iat": int(time.time()),
-        "nonce": "nonce-" + uuid.uuid4().hex,
-        "https://purl.imsglobal.org/spec/lti/claim/deployment_id": jwt_request.deployment_id,
-        "https://purl.imsglobal.org/spec/lti/claim/message_type": "LtiDeepLinkingResponse",
-        "https://purl.imsglobal.org/spec/lti/claim/version": "1.3.0",
-        "https://purl.imsglobal.org/spec/lti-dl/claim/content_items": content_items,
-        "https://purl.imsglobal.org/spec/lti-dl/claim/data": jwt_request.deep_linking_settings_data,
-    }
-    return claims
+    question1 = request.form.get("ackOauth", "off")
+    question2 = request.form.get("ackGradeReturn", "off")
+    question3 = request.form.get("ackREST", "off")
+    comment = request.form.get("comment", "")
+    request_cookie_state = request.form.get("state")
+
+    if not question1 or not question2 or not question3:
+        abort(400, "InvalidParameterException - Missing required parameter")
+    if not request_cookie_state:
+        abort(400, "InvalidParameterException - Missing state")
+
+    state: LTIState = LTIState(LTIStateStorage()).load(request_cookie_state)
+
+    if not state:
+        abort(409, "InvalidParameterException - State not found")
+
+    try:
+        id_token = state.record.id_token
+        jwt_request = LTIJwtPayload(id_token)
+
+        lti_token = state.record.get_platform_lti_token()
+        # Get Learn URL from the JWT
+        line_item_url = jwt_request.endpoint_lineitem.rstrip("/")
+
+        # Calculate score
+        score = 0
+        if question1 == "on":
+            score += 30
+        if question2 == "on":
+            score += 30
+        if question3 == "on":
+            score += 30
+
+        # Construct payload for Learning Tools Interoperability (LTI) Assignment and Grade Services (AGS) call
+        score_json = {
+            "userId": jwt_request.sub,
+            "scoreGiven": score,
+            "scoreMaximum": 100,
+            "comment": comment,
+            "timestamp": datetime.datetime.utcnow().replace(tzinfo=datetime.timezone.utc).isoformat(),
+            "activityProgress": "Completed",
+            "gradingProgress": "FullyGraded",
+        }
+
+        headers = {
+            "content-type": "application/vnd.ims.lis.v1.score+json",
+            "Authorization": f"Bearer {lti_token}",
+        }
+
+        # Make AGS call to update grade
+        response = requests.post(f"{line_item_url}/scores", json=score_json, headers=headers)
+
+        return render_template("submission_success.html", status=response.status_code, response=response.text)
+    except Exception as e:
+        abort(500, e)
 
 
 def create_assignment(request):
-    """
 
-    :return:
-    """
+    name = request.form.get("name")
+    points = request.form.get("points")
+    id_token = request.form.get("id_token")
 
-    name = request.form.get("name", "err")
-    points = request.form.get("points", "err")
-    id_token = request.form.get("id_token", "err")
-    jwt_request = LTIJwtPayload(id_token)
-    lti_tool = LTITool(LTIToolStorage())
+    if not name or not points or not id_token:
+        abort(400, "InvalidParameterException - Missing required parameter")
 
-    content = get_assignment_content(name, points)
+    try:
+        jwt_request = LTIJwtPayload(id_token)
+        lti_tool = LTITool(LTIToolStorage())
 
-    return_url = jwt_request.deep_linking_settings_return_url
-    deep_link_jwt = get_message_claims(jwt_request, content)
+        content = get_assignment_content(name, points)
 
-    jwt = LTIJwtPayload()
-    jwtstring = jwt.encode(payload=deep_link_jwt, tool=lti_tool)
+        return_url = jwt_request.deep_linking_settings_return_url
+        deep_link_jwt = get_message_claims(jwt_request, content)
 
-    pretty_body = json.dumps(deep_link_jwt, sort_keys=True, indent=2, separators=(",", ": "))
+        jwt = LTIJwtPayload()
+        jwtstring = jwt.encode(payload=deep_link_jwt, tool=lti_tool)
 
-    return render_template(
-        "confirm_assignment.html",
-        pretty_body=pretty_body,
-        jwt=jwtstring,
-        return_url=return_url,
-    )
+        pretty_body = json.dumps(deep_link_jwt, sort_keys=True, indent=2, separators=(",", ": "))
 
+        return render_template(
+            "confirm_assignment.html",
+            pretty_body=pretty_body,
+            jwt=jwtstring,
+            return_url=return_url,
+        )
+    except Exception as e:
+        abort(500, e)
 
 def get_assignment_content(name, points):
     # Mock return value to simulate a assignment content item
@@ -96,52 +136,21 @@ def get_assignment_content(name, points):
     return [content_item]
 
 
-def submit_assignment(request):
-    """
 
-    :return:
-    """
 
-    question1 = request.form.get("ackOauth", "off")
-    question2 = request.form.get("ackGradeReturn", "off")
-    question3 = request.form.get("ackREST", "off")
-    comment = request.form.get("comment", "")
-
-    request_cookie_state = request.form.get("state")
-    state: LTIState = LTIState(LTIStateStorage()).load(request_cookie_state)
-    lti_token = state.record.get_platform_lti_token()
-    id_token = state.record.id_token
-    jwt_request = LTIJwtPayload(id_token)
-
-    # Calculate score
-    score = 0
-    if question1 == "on":
-        score += 30
-    if question2 == "on":
-        score += 30
-    if question3 == "on":
-        score += 30
-
-    # Get Learn URL from the JWT
-    line_item_url = jwt_request.endpoint_lineitem.rstrip("/")
-
-    # Construct payload for Learning Tools Interoperability (LTI) Assignment and Grade Services (AGS) call
-    score_json = {
-        "userId": jwt_request.sub,
-        "scoreGiven": score,
-        "scoreMaximum": 100,
-        "comment": comment,
-        "timestamp": datetime.datetime.utcnow().replace(tzinfo=datetime.timezone.utc).isoformat(),
-        "activityProgress": "Completed",
-        "gradingProgress": "FullyGraded",
+def get_message_claims(jwt_request: LTIJwtPayload, content_items) -> dict:
+    claims = {
+        "iss": jwt_request.aud,
+        "aud": [jwt_request.iss],
+        "exp": int(time.time()) + 600,
+        "iat": int(time.time()),
+        "nonce": "nonce-" + uuid.uuid4().hex,
+        "https://purl.imsglobal.org/spec/lti/claim/deployment_id": jwt_request.deployment_id,
+        "https://purl.imsglobal.org/spec/lti/claim/message_type": "LtiDeepLinkingResponse",
+        "https://purl.imsglobal.org/spec/lti/claim/version": "1.3.0",
+        "https://purl.imsglobal.org/spec/lti-dl/claim/content_items": content_items,
+        "https://purl.imsglobal.org/spec/lti-dl/claim/data": jwt_request.deep_linking_settings_data,
     }
+    return claims
 
-    headers = {
-        "content-type": "application/vnd.ims.lis.v1.score+json",
-        "Authorization": f"Bearer {lti_token}",
-    }
 
-    # Make AGS call to update grade
-    response = requests.post(f"{line_item_url}/scores", json=score_json, headers=headers)
-
-    return render_template("submission_success.html", status=response.status_code, response=response.text)
