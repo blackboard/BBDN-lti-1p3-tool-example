@@ -150,3 +150,5 @@ cdk.out
 .staging
 **/*.DS_Store
 out
+*.bkp
+node_modules

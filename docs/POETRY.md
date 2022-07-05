@@ -22,23 +22,23 @@ To use Poetry's virtual environment in Intellij first follow the [prerequisites]
 
 Then open the "Project Structure" in Intellij and select "SDKs" then click the "+" button to "Add New SDK"
 
-![poetry01.png](../images/poetry01.png)
+![poetry01.png](images/poetry01.png)
 
 Select "Add Python SDK..."
 
-![poetry02.png](../images/poetry02.png)
+![poetry02.png](images/poetry02.png)
 
 Select "Virtualenv Environment", select "Existing environment", and then click "..." next to "Interpreter"
 
-![poetry03.png](../images/poetry03.png)
+![poetry03.png](images/poetry03.png)
 Enter the path to your project's .venv/bin/python file and hit "OK"
 
-![poetry04.png](../images/poetry04.png)
+![poetry04.png](images/poetry04.png)
 
 The classpath will be populated. Give the SDK a unique name to identify it as the SDK for this project.
 
-![poetry05.png](../images/poetry05.png)
+![poetry05.png](images/poetry05.png)
 
 Finally, ensure your project has the newly created SDK selected under "Project Structure" -> "Project Settings" -> "Project" -> "Project SDK"
 
-![poetry06.png](../images/poetry06.png)
+![poetry06.png](images/poetry06.png)
