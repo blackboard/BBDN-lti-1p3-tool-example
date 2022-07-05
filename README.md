@@ -23,69 +23,64 @@ $ poetry shell
 
 ## Deployment
 
-Export your AWS account and region where the stacks will be deployed
-
-```
-$ export AWS_DEFAULT_ACCOUNT=<YOUR_ACCOUNT_NUMBER>
-$ export AWS_DEFAULT_REGION=<YOUR_AWS_REGION>
-```
-
 If you haven't already be sure to bootstrap your cdk environment. This only needs to be done once.
 
 ```
-$ cdk bootstrap aws://$AWS_DEFAULT_ACCOUNT/$AWS_DEFAULT_REGION
+$ cdk bootstrap 
+```
+
+At this point you can now deploy the stacks to your AWS account
+
+### workshop-application-stack
+This stack deploys the LTI application directly to you AWS account.
+```
+$ cdk deploy 
 ```
 
 At this point you can now deploy the stacks to you AWS account
 
-### pipeline-stack
+### pipeline-stack (optional)
+This stack sets up a CI/CD pipeline connected to a GitHub repository which will build and deploy the LTI application when new code is checked in.
 
 To deploy the pipeline issue the following command
 
 ```
-$ cdk deploy -c account=$AWS_DEFAULT_ACCOUNT -c region=$AWS_DEFAULT_REGION -c repo=<THE_GITHUB_ORG>/<THE_GIT_HUB_REPOSITORY> -c branch=$(git rev-parse --abbrev-ref HEAD) -c codestar_connection_arn=<CODESTART_CONNECTION_ARN> -a "python pipeline.py pipeline-stack-$(git rev-parse --abbrev-ref HEAD | sed -e 's/\//-/g')
+$ cdk deploy -c account=$AWS_DEFAULT_ACCOUNT -c region=$AWS_DEFAULT_REGION -c repo=<THE_GITHUB_ORG>/<THE_GIT_HUB_REPOSITORY> -c branch=$(git rev-parse --abbrev-ref HEAD) -c codestar_connection_arn=<CODESTART_CONNECTION_ARN> pipeline-stack-$(git rev-parse --abbrev-ref HEAD | sed -e 's/\//-/g')
 ```
 
 To complete the pipeline setup you must go into the AWS Console, navigate to CodePipeline, on the left hand side expand "Settings" and click "Connections"
 
-![Connection settings](./images/connections01.png)
+![Connection settings](docs/images/connections01.png)
 
 Look for a connection with your repo name and a status of "Pending", click on this connection
 
-![Connection settings](./images/connections02.png)
+![Connection settings](docs/images/connections02.png)
 
 Click the button that says Update pending connection
 
-![Connection settings](./images/connections03.png)
+![Connection settings](docs/images/connections03.png)
 
 Click "Install a new app"
 
-![Connection settings](./images/connections04.png)
+![Connection settings](docs/images/connections04.png)
 
 Select the correct organization
 
-![Connection settings](./images/connections05.png)
+![Connection settings](docs/images/connections05.png)
 
 Ensure the right repository is selected, hit save (you may have to toggle the radio buttons to get the save button to activate)
 
-![Connection settings](./images/connections06.png)
+![Connection settings](docs/images/connections06.png)
 
 Finally, click "Connect" to complete the connection setup
 
-![Connection settings](./images/connections07.png)
+![Connection settings](docs/images/connections07.png)
 
 Once the connection to github is complete you can trigger the pipeline by checking code into the configured branch or manually triggering the pipeline by clicking the "Release change" button in the AWS Console
 
 You should deploy the pipeline stack first before
 
-### application-stack
-
-To deploy the application directly without a pipeline issue this command
-
-```
-$ cdk deploy -c account=$AWS_DEFAULT_ACCOUNT -c region=$AWS_DEFAULT_REGION -c repo=<THE_GITHUB_ORG>/<THE_GIT_HUB_REPOSITORY> -c branch=$(git rev-parse --abbrev-ref HEAD) -c codestar_connection_arn=<CODESTART_CONNECTION_ARN> application-stack-$(git rev-parse --abbrev-ref HEAD | sed -e 's/\//-/g')
-```
-
+### Run locally with Flask
 You can also run locally using the following command
 
 ```
