@@ -72,7 +72,6 @@ def submit_assignment(request):
     except Exception as e:
         abort(500, e)
 
-
 def create_assignment(request):
 
     name = request.form.get("name")
@@ -118,11 +117,6 @@ def get_assignment_content(name, points):
         title=name,
         text="Do this assignment",
         url=lti_launch_url,
-        icon=dict(
-            url="https://static.thenounproject.com/png/1993078-200.png",
-            width=100,
-            height=100,
-        ),
         lineItem=dict(scoreMaximum=points, label=name, resourceId=assignment_id, tag="originality"),
         custom=dict(
             assignment_id=assignment_id,
@@ -134,9 +128,6 @@ def get_assignment_content(name, points):
     )
 
     return [content_item]
-
-
-
 
 def get_message_claims(jwt_request: LTIJwtPayload, content_items) -> dict:
     claims = {

@@ -130,7 +130,7 @@ def render_ui(jwt_request: LTIJwtPayload, state, id_token):
             course_name=jwt_request.context_title,
             course_created=course_created_date,
         )
-    else:
+    elif jwt_request.message_type == "LtiDeepLinkingRequest":
         action_url = f"{tool.config.base_url()}/create_assignment"
         return render_template(
             "create_assignment.html",
@@ -139,4 +139,6 @@ def render_ui(jwt_request: LTIJwtPayload, state, id_token):
             id_token=id_token,
             action_url=action_url,
         )
+    else:
+        abort(409, "InvalidParameterException - Unknown message type")
 
