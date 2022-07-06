@@ -23,8 +23,7 @@ class LearnClient:
     def __log(self):
         return logging.getLogger("LearnClient")
 
-    @staticmethod
-    def get_course_info(jwt_request: LTIJwtPayload, request_cookie_state):
+    def get_course_info(self, jwt_request: LTIJwtPayload, request_cookie_state):
         state: LTIState = LTIState(LTIStateStorage()).load(request_cookie_state)
         learn_access_token = state.record.get_platform_learn_rest_token()
         learn_url = jwt_request.platform_url.rstrip("/")
@@ -36,5 +35,7 @@ class LearnClient:
         if response.status_code == 200:
             return response.json()
         else:
-            print(f"Error getting course info via Learn public API, status: {response.status_code}")
+            self.__log().error(
+                f"Error getting course info via Learn public API, status: {response.status_code}"
+            )
             return {}
