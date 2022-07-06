@@ -112,11 +112,14 @@ def render_ui(jwt_request: LTIJwtPayload, state, id_token):
 
     tool = LTITool(LTIToolStorage())
 
-    course_created_date = ""
+    course_date = ""
     if jwt_request.platform_product_code == "BlackboardLearn":
         course_info = LearnClient().get_course_info(jwt_request, state)
-        if "created" in course_info:
-            course_created_date = course_info["created"]
+        course_date = (
+            course_info["modified"]
+            if "modified" in course_info
+            else ""
+        )
 
     if jwt_request.message_type == "LtiResourceLinkRequest":
         action_url = f"{tool.config.base_url()}/submit_assignment"
@@ -128,7 +131,7 @@ def render_ui(jwt_request: LTIJwtPayload, state, id_token):
             state=state,
             action_url=action_url,
             course_name=jwt_request.context_title,
-            course_created=course_created_date,
+            course_modified=course_date,
         )
     elif jwt_request.message_type == "LtiDeepLinkingRequest":
         action_url = f"{tool.config.base_url()}/create_assignment"
