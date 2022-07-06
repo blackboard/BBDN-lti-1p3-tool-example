@@ -13,7 +13,7 @@ from app.models.tool_config import LTIToolStorage
 def config():
     tool = LTITool(LTIToolStorage())
     action_url = f"{tool.config.base_url()}/platform"
-    return render_template("config.html", action_url=action_url)
+    return render_template("config.html", action_url=action_url, base_url=tool.config.base_url())
 
 
 def register(request):

@@ -26,6 +26,8 @@ class LTIJwtPayload(BaseModel):
     deep_linking_settings_return_url: Optional[str] = None
     deployment_id: Optional[str] = None
     endpoint_lineitem: Optional[str] = None
+    endpoint_lineitems: Optional[str] = None
+    scopes:Optional[str] = None
     iss: Optional[str] = None
     message_type: Optional[str] = None
     nonce: Optional[str] = None
@@ -85,7 +87,17 @@ class LTIJwtPayload(BaseModel):
             # https://www.imsglobal.org/spec/lti-ags/v2p0/
             self.endpoint_lineitem = (
                 payload["https://purl.imsglobal.org/spec/lti-ags/claim/endpoint"]["lineitem"]
-                if "https://purl.imsglobal.org/spec/lti-ags/claim/endpoint" in payload and "lineitem" in payload
+                if "https://purl.imsglobal.org/spec/lti-ags/claim/endpoint" in payload and "lineitem" in payload["https://purl.imsglobal.org/spec/lti-ags/claim/endpoint"]
+                else ""
+            )
+            self.endpoint_lineitems = (
+                payload["https://purl.imsglobal.org/spec/lti-ags/claim/endpoint"]["lineitems"]
+                if "https://purl.imsglobal.org/spec/lti-ags/claim/endpoint" in payload and "lineitems" in payload["https://purl.imsglobal.org/spec/lti-ags/claim/endpoint"]
+                else ""
+            )
+            self.scopes = (
+                payload["https://purl.imsglobal.org/spec/lti-ags/claim/endpoint"]["scopes"]
+                if "https://purl.imsglobal.org/spec/lti-ags/claim/endpoint" in payload and "scopes" in payload["https://purl.imsglobal.org/spec/lti-ags/claim/endpoint"]
                 else ""
             )
             self.iss = payload["iss"]
