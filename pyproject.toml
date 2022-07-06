@@ -62,6 +62,7 @@ moto = "^3.1.13"
 pytest-mock = "^3.7.0"
 exceptiongroup = "^1.0.0-rc.8"
 autopep8 = "^1.6.0"
+requests-mock = "^1.9.3"
 
 
 [build-system]

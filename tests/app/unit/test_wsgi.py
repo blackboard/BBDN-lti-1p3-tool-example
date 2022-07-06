@@ -4,7 +4,8 @@ import time
 from datetime import datetime
 from unittest.mock import MagicMock
 from urllib import parse
-
+import requests
+import requests_mock
 import boto3
 import pytest
 from cryptography.hazmat.primitives import hashes
@@ -208,6 +209,12 @@ def test_launch(aws, id_token, platform_jwks, state):
     )
     PyJWKClient.fetch_data = MagicMock(return_value=platform_jwks)
     wsgi.application.register_error_handler(Exception, handle_exception)
+
+    requests_mock.post(
+        url="https://developer.blackboard.com/api/v1/gateway/oauth2/jwttoken",
+        status_code=200,
+        text=json.dumps({"access_token": "fake_token"}),
+    )
     response = wsgi.lambda_handler(request_event, {})
     assert response
     assert response["statusCode"] == 302
@@ -241,7 +248,10 @@ def test_login(dynamodb):
     assert query["scope"][0] == "openid"
     assert query["response_type"][0] == "id_token"
     assert query["client_id"][0] == "75363971-2683-4ad9-a31b-93ec41e27772"
-    assert query["redirect_uri"][0] == "https://ymhk99ns7g.execute-api.us-east-2.amazonaws.com/prod/launch"
+    assert (
+        query["redirect_uri"][0]
+        == "https://ymhk99ns7g.execute-api.us-east-2.amazonaws.com/prod/launch"
+    )
     assert (
         query["login_hint"][0]
         == "https%3A%2F%2Flearn25.anthology.workshops.aws.dev%2Fwebapps%2Fblackboard%2Fexecute%2Fblti%2FlaunchPlacement%3Fcmd%3Dauthenticate%26course_id%3D_3_1,10ac1fc7a50c4433ae104c283cc66e47,67934c629a3845f8beb2f71241e3b13f"
@@ -258,7 +268,9 @@ def register_tool_jwks(dynamodb, tool_jwks):
         Item={
             "PK": {"S": "JWK#db9de74b-4990-4acf-af63-0da8adeb2a49"},
             "kid": {"S": "db9de74b-4990-4acf-af63-0da8adeb2a49"},
-            "kms_key_id": {"S": "arn:aws:kms:us-east-2:200982613275:key/02f144bb-80c8-42ba-836b-d4248bd876c3"},
+            "kms_key_id": {
+                "S": "arn:aws:kms:us-east-2:200982613275:key/02f144bb-80c8-42ba-836b-d4248bd876c3"
+            },
             "public_key_pem": {
                 "S": "LS0tLS1CRUdJTiBSU0EgUFVCTElDIEtFWS0tLS0tCk1JSUJDZ0tDQVFFQXByY1Y0dW0ydFpzUkttV2JUUFpySUp0T3ZicDBWV0lRanBvWnhyZmR1OFI0YWlWWjR0UE0KY04zY2x2ZVl5TEY0VThzSnNjS3ZrT3AwbGJVZ2dtRzRCWlI3NFkveko1NW9IZjZ4NTV1WktIbDZJOGNTZmtGLwpic0pqM2I4R0VPNnU0QjhGVFpsQ3c0dWhJemFXTyt3eEJuRmhzaWx0WFpBa3JvcXNPa1Q2dDlvU2FJRXVya3pECm43L2g3K0NxTklKWXlEOTNFZytGKzhaTUpjVjRITThMVTlKRWUxWW10eDFndk02OXNsNHByRndoM2JJN2FvV00KSG9GYlVKT2czUFlIQ0UxRml4MlZ0b0t6K3ptL0FETnRqeVhMSU1OMWR4MGkwSThTcWVmR2x2QVdyWXBlVjhqbwpuNDM0dm9Cbm4xcHdKelJyNklvbi9Ba25VRXBlVG94YTN3SURBUUFCCi0tLS0tRU5EIFJTQSBQVUJMSUMgS0VZLS0tLS0K"
             },
@@ -274,8 +286,12 @@ def register_lti_platforms(dynamodb):
             "PK": {
                 "S": "CONFIG#75363971-2683-4ad9-a31b-93ec41e27772#https://blackboard.com#f66151aa-a799-4b22-93ed-81dd16f70a4e"
             },
-            "auth_login_url": {"S": "https://developer.blackboard.com/api/v1/gateway/oidcauth"},
-            "auth_token_url": {"S": "https://developer.blackboard.com/api/v1/gateway/oauth2/jwttoken"},
+            "auth_login_url": {
+                "S": "https://developer.blackboard.com/api/v1/gateway/oidcauth"
+            },
+            "auth_token_url": {
+                "S": "https://developer.blackboard.com/api/v1/gateway/oauth2/jwttoken"
+            },
             "client_id": {"S": "75363971-2683-4ad9-a31b-93ec41e27772"},
             "iss": {"S": "https://blackboard.com"},
             "key_set_url": {
