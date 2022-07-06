@@ -54,7 +54,9 @@ def submit_assignment(request):
             "scoreGiven": score,
             "scoreMaximum": 100,
             "comment": comment,
-            "timestamp": datetime.datetime.utcnow().replace(tzinfo=datetime.timezone.utc).isoformat(),
+            "timestamp": datetime.datetime.utcnow()
+            .replace(tzinfo=datetime.timezone.utc)
+            .isoformat(),
             "activityProgress": "Completed",
             "gradingProgress": "FullyGraded",
         }
@@ -65,11 +67,21 @@ def submit_assignment(request):
         }
 
         # Make AGS call to update grade
-        response = requests.post(f"{line_item_url}/scores", json=score_json, headers=headers)
-
-        return render_template("submission_success.html", status=response.status_code, response=response.text)
+        response = requests.post(
+            f"{line_item_url}/scores", json=score_json, headers=headers
+        )
+        pretty_body = json.dumps(
+            score_json, sort_keys=True, indent=2, separators=(",", ": ")
+        )
+        return render_template(
+            "submission_success.html",
+            status=response.status_code,
+            response=response.text,
+            pretty_body=pretty_body,
+        )
     except Exception as e:
         abort(500, e)
+
 
 def create_assignment(request):
 
@@ -97,7 +109,9 @@ def create_assignment(request):
         jwt = LTIJwtPayload()
         jwtstring = jwt.encode(payload=deep_link_claims, tool=lti_tool)
 
-        pretty_body = json.dumps(deep_link_claims, sort_keys=True, indent=2, separators=(",", ": "))
+        pretty_body = json.dumps(
+            deep_link_claims, sort_keys=True, indent=2, separators=(",", ": ")
+        )
 
         return render_template(
             "confirm_assignment.html",
@@ -107,6 +121,7 @@ def create_assignment(request):
         )
     except Exception as e:
         abort(500, e)
+
 
 def get_assignment_content(name, points):
     # Mock return value to simulate a assignment content item
@@ -121,7 +136,9 @@ def get_assignment_content(name, points):
         title=name,
         text="Do this assignment",
         url=lti_launch_url,
-        lineItem=dict(scoreMaximum=points, label=name, resourceId=assignment_id, tag="originality"),
+        lineItem=dict(
+            scoreMaximum=points, label=name, resourceId=assignment_id, tag="originality"
+        ),
         custom=dict(
             assignment_id=assignment_id,
             userNameLTI="$User.username",
@@ -132,6 +149,7 @@ def get_assignment_content(name, points):
     )
 
     return [content_item]
+
 
 def get_message_claims(jwt_request: LTIJwtPayload, content_items) -> dict:
     claims = {
@@ -147,5 +165,3 @@ def get_message_claims(jwt_request: LTIJwtPayload, content_items) -> dict:
         "https://purl.imsglobal.org/spec/lti-dl/claim/data": jwt_request.deep_linking_settings_data,
     }
     return claims
-
-
