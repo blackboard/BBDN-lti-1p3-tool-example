@@ -38,7 +38,7 @@ def submit_assignment(request):
         lti_token = state.record.get_platform_lti_token()
         # Get Learn URL from the JWT
         line_item_url = jwt_request.endpoint_lineitem.rstrip("/")
-
+        name = jwt_request.payload["name"]
         # Calculate score
         score = 0
         if question1 == "on":
@@ -78,6 +78,7 @@ def submit_assignment(request):
             status=response.status_code,
             response=response.text,
             pretty_body=pretty_body,
+            name=name,
         )
     except Exception as e:
         abort(500, e)
