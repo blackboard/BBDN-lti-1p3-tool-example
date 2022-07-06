@@ -24,16 +24,13 @@ lti_scopes = (
 
 
 class GrantType(Enum):
-    client_credentials = auto()
-    auth_code = auto()
+    CLIENT_CREDENTIALS = auto()
+    AUTH_CODE = auto()
 
 
 class TokenClient:
     def __init__(self, **kwargs):
         init_logger("TokenClient")
-
-    def __log(self):
-        return logging.getLogger("TokenClient")
 
     @staticmethod
     def request_bearer_token(platform: LTIPlatform, grantType: GrantType, tool: LTITool) -> str:
@@ -41,9 +38,9 @@ class TokenClient:
         logging.debug(f"GrantType: {grantType}")
         access_token: str
 
-        if grantType == GrantType.client_credentials:
+        if grantType == GrantType.CLIENT_CREDENTIALS:
             access_token = TokenClient.__request_bearer_client_credential(platform=platform, tool=tool)
-        elif grantType == GrantType.auth_code:
+        elif grantType == GrantType.AUTH_CODE:
             access_token = TokenClient.__request_bearer_auth_code(platform=platform)
 
         return access_token
@@ -61,18 +58,14 @@ class TokenClient:
             auth=(lti_tool.config.learn_app_key, lti_tool.config.learn_app_secret),
         )
 
-        print("[auth:setToken()] STATUS CODE: " + str(r.status_code))
-        # strip quotes from result for better dumps
-        res = json.loads(r.text)
-        print("[auth:setToken()] RESPONSE: \n" + json.dumps(res, indent=4, separators=(",", ": ")))
+        if not r.ok:
+            msg = f"Error retrieving access token from platfom {oauth_url}. {r.reason}: {r.text}"
+            logging.error(msg)
+            raise Exception(msg)
 
-        if r.status_code == 200:
-            parsed_json = json.loads(r.text)
-            learn_rest_token = parsed_json["access_token"]
-            return learn_rest_token
-        else:
-            print("[auth:setToken()] ERROR")
-            return "no_token"
+        # access token (bearer token) to be used to communicate with the Learn REST APIs
+        learn_rest_token = r.json()["access_token"]
+        return learn_rest_token
 
     @staticmethod
     def __request_bearer_client_credential(platform: LTIPlatform, tool: LTITool) -> str:
@@ -109,10 +102,8 @@ class TokenClient:
         if not r.ok:
             msg = f"Error retrieving access token from platfom {platform.config.auth_token_url}. {r.reason}: {r.text}"
             logging.error(msg)
-            # TODO: uncomment
-            # raise Exception(msg)
-            return "not_a_real_token"
-
+            raise Exception(msg)
+        
         # access token (bearer token) to be used to communicate with the Provider (LMS)
         access_token = r.json()["access_token"]
         return access_token

@@ -1,4 +1,4 @@
-# LTI Tool Example
+# LTI Example Tool
 
 This is an LTI tool allow an instructor to create an assessment, and allow students to complete the assessment and get a grade
 
@@ -108,7 +108,8 @@ export PORT=5000
 export DOMAIN=127.0.0.1
 export KMS_KEY_ID='arn:aws:kms:???'
 export KMS_SYMMETRIC_KEY_ID='arn:aws:kms:???'
-# The next five are stored in ParameterStore. Create keys for your instance
+
+# The next three are stored in ParameterStore. Create keys for your instance
 export LTI_TOOLING_API_URL_KEY='/keys/somewhere/tool_url'
 export LEARN_APPLICATION_KEY_KEY='/keys/somewhere/learn_key'
 export LEARN_APPLICATION_SECRET_KEY='/keys/somewhere/learn_secret'```

@@ -7,6 +7,7 @@ from flask import abort
 from flask import redirect
 from flask import render_template
 
+from app.controllers import rest_auth_controller
 from app.models.jwt import LTIJwtPayload
 from app.models.platform_config import LTIPlatform
 from app.models.platform_config import LTIPlatformStorage
@@ -15,6 +16,7 @@ from app.models.state import LTIStateStorage
 from app.models.tool_config import LTITool
 from app.models.tool_config import LTIToolStorage
 from app.utility import init_logger
+from app.utility.learn_client import LearnClient
 from app.utility.token_client import GrantType
 from app.utility.token_client import TokenClient
 
@@ -49,47 +51,46 @@ def launch(request):
         except Exception as e:
             abort(401, e)
 
+        # Load the user's State record
         state: LTIState = LTIState(LTIStateStorage()).load(request_cookie_state)
         # Validate the state and nonce
         if not state.validate(jwt_request.nonce):
             abort(409, "InvalidParameterException - Unable to verify State")
+        
+        # Add the id_token (JWT) to the user's State record
+        state.record.id_token = id_token
+
+        # Load the global config for this Tool
         lti_tool = LTITool(LTIToolStorage())
-        # Get the LTI 1.3 access token for use for LTI based Tool Originating Messages
+        # Reqest an access token for use for LTI 1.3 based Tool Originating Messages
         lti_token = TokenClient().request_bearer_token(
-            platform=platform, grantType=GrantType.client_credentials, tool=lti_tool
+            platform=platform, grantType=GrantType.CLIENT_CREDENTIALS, tool=lti_tool
         )
 
-        # Using convenience method to encrypt the platform LTI access token before saving
+        # Add the access token to the user's State record (convenience method to encryption)
         state.record.set_platform_lti_token(lti_token)
-        state.record.id_token = id_token
-        # Save the token on the State record
+        # Save the user's State record
         state.save()
 
-        ##################
-        # Learn REST access token for accessing the Learn REST API: Authorization Code grant
-        # https://developer.blackboard.com/portal/displayApi/
-        # https://www.oauth.com/oauth2-servers/access-tokens/authorization-code-request/
-        ##################
-        # get a Learn REST access token via 3LO flow
+        # Blackboard Three-Legged OAuth (3LO) for Learn REST API
+        if jwt_request.platform_product_code == "BlackboardLearn":
+            ##################
+            # Learn REST access token for accessing the Learn REST API: Authorization Code grant
+            # https://docs.blackboard.com/rest-apis/learn/getting-started/3lo
+            # https://developer.blackboard.com/portal/displayApi/
+            # https://www.oauth.com/oauth2-servers/access-tokens/authorization-code-request/
+            ##################
+            params = {
+                "redirect_uri": lti_tool.config.auth_code_url(),
+                "response_type": "code",
+                "client_id": lti_tool.config.learn_app_key,  # despite the naming this is the Learn Application Key
+                "scope": "*",
+                "state": request_post_state,
+            }
+            encoded_params = urlencode(params)
 
-        params = {
-            "redirect_uri": lti_tool.config.auth_code_url(),
-            "response_type": "code",
-            "client_id": lti_tool.config.learn_app_key,  # despite the naming this is the Learn Application Key
-            "scope": "*",
-            "state": request_post_state,
-        }
-
-        encoded_params = urlencode(params)
-        product_family_code = jwt_request.payload["https://purl.imsglobal.org/spec/lti/claim/tool_platform"][
-            "product_family_code"
-        ]
-        # 3LO
-        if "BlackboardLearn" == product_family_code:
-            learn_url = jwt_request.payload["https://purl.imsglobal.org/spec/lti/claim/tool_platform"]["url"].rstrip(
-                "/"
-            )
-            one_time_session_token = jwt_request.payload["https://blackboard.com/lti/claim/one_time_session_token"]
+            learn_url = jwt_request.platform_url.rstrip("/")
+            one_time_session_token = jwt_request.one_time_session_token
             auth_code_url = f"{learn_url}/learn/api/public/v1/oauth2/authorizationcode?{encoded_params}&one_time_session_token={one_time_session_token}"
             return redirect(auth_code_url)
         else:
@@ -98,32 +99,7 @@ def launch(request):
         abort(500, e)
 
 
-def authcode(request):
-    auth_code = request.args.get("code", "")
-    request_cookie_state = request.cookies.get("state")
-    state: LTIState = LTIState(LTIStateStorage()).load(request_cookie_state)
-
-    id_token = state.record.id_token
-    jwt_request = LTIJwtPayload(id_token)
-
-    lti_tool = LTITool(LTIToolStorage())
-    auth_code_url = lti_tool.config.auth_code_url()
-    # Now we need to load the original JWT from cache to get all the data again.
-    product_family_code = jwt_request.payload["https://purl.imsglobal.org/spec/lti/claim/tool_platform"][
-        "product_family_code"
-    ]
-    # 3LO
-    if "BlackboardLearn" == product_family_code:
-        learn_url = jwt_request.payload["https://purl.imsglobal.org/spec/lti/claim/tool_platform"]["url"].rstrip("/")
-        learn_access_token = TokenClient().get_learn_access_token(learn_url, auth_code_url, auth_code)
-        # Cache the REST access token
-        state.record.set_platform_learn_rest_token(learn_access_token)
-        state.save()
-
-    return render_ui(jwt_request, request_cookie_state, id_token)
-
-
-def render_ui(jwt_request, state, id_token):
+def render_ui(jwt_request: LTIJwtPayload, state, id_token):
     pretty_body = json.dumps(jwt_request.payload, sort_keys=True, indent=2, separators=(",", ": "))
 
     # Get the user's name; they might not have a "full name"
@@ -136,13 +112,16 @@ def render_ui(jwt_request, state, id_token):
 
     tool = LTITool(LTIToolStorage())
 
-    course_info = get_course_info(jwt_request, state)
-    if "created" in course_info:
-        course_created_date = course_info["created"]
-    else:
-        course_created_date = ""
+    course_date = ""
+    if jwt_request.platform_product_code == "BlackboardLearn":
+        course_info = LearnClient().get_course_info(jwt_request, state)
+        course_date = (
+            course_info["modified"]
+            if "modified" in course_info
+            else ""
+        )
 
-    if jwt_request.payload["https://purl.imsglobal.org/spec/lti/claim/message_type"] == "LtiResourceLinkRequest":
+    if jwt_request.message_type == "LtiResourceLinkRequest":
         action_url = f"{tool.config.base_url()}/submit_assignment"
         return render_template(
             "knowledge_check.html",
@@ -151,10 +130,10 @@ def render_ui(jwt_request, state, id_token):
             id_token=id_token,
             state=state,
             action_url=action_url,
-            course_name=jwt_request.payload["https://purl.imsglobal.org/spec/lti/claim/context"]["title"],
-            course_created=course_created_date,
+            course_name=jwt_request.context_title,
+            course_modified=course_date,
         )
-    else:
+    elif jwt_request.message_type == "LtiDeepLinkingRequest":
         action_url = f"{tool.config.base_url()}/create_assignment"
         return render_template(
             "create_assignment.html",
@@ -163,26 +142,6 @@ def render_ui(jwt_request, state, id_token):
             id_token=id_token,
             action_url=action_url,
         )
-
-
-def get_course_info(jwt_request, request_cookie_state):
-    state: LTIState = LTIState(LTIStateStorage()).load(request_cookie_state)
-    learn_access_token = state.record.get_platform_learn_rest_token()
-    learn_url = jwt_request.payload["https://purl.imsglobal.org/spec/lti/claim/tool_platform"]["url"].rstrip("/")
-    course_uuid = jwt_request.payload["https://purl.imsglobal.org/spec/lti/claim/context"]["id"]
-    headers = {"Authorization": f"Bearer {learn_access_token}"}
-    course_info_url = f"{learn_url}/learn/api/public/v2/courses/uuid:{course_uuid}"
-    response = requests.get(course_info_url, headers=headers)
-
-    if response.status_code == 200:
-        return response.json()
     else:
-        print(f"Error getting course info via Learn public API, status: {response.status_code}")
-        return {}
+        abort(409, "InvalidParameterException - Unknown message type")
 
-
-def __log():
-    return logging.getLogger("routes")
-
-
-init_logger("routes")
