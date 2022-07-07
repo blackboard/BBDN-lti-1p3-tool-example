@@ -209,15 +209,15 @@ def test_launch(aws, id_token, platform_jwks, state):
     )
     PyJWKClient.fetch_data = MagicMock(return_value=platform_jwks)
     wsgi.application.register_error_handler(Exception, handle_exception)
-
-    requests_mock.post(
-        url="https://developer.blackboard.com/api/v1/gateway/oauth2/jwttoken",
-        status_code=200,
-        text=json.dumps({"access_token": "fake_token"}),
-    )
-    response = wsgi.lambda_handler(request_event, {})
-    assert response
-    assert response["statusCode"] == 302
+    with requests_mock.Mocker() as m:
+        m.post(
+            url="https://developer.blackboard.com/api/v1/gateway/oauth2/jwttoken",
+            status_code=200,
+            text=json.dumps({"access_token": "fake_token"}),
+        )
+        response = wsgi.lambda_handler(request_event, {})
+        assert response
+        assert response["statusCode"] == 302
 
 
 def test_platform_register(dynamodb):
