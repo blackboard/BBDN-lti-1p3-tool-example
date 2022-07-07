@@ -56,7 +56,7 @@ def launch(request):
         # Validate the state and nonce
         if not state.validate(jwt_request.nonce):
             abort(409, "InvalidParameterException - Unable to verify State")
-        
+
         # Add the id_token (JWT) to the user's State record
         state.record.id_token = id_token
 

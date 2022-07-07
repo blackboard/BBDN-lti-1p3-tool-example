@@ -123,7 +123,6 @@ def create_assignment(request):
     except Exception as e:
         abort(500, e)
 
-
 def get_assignment_content(name, points):
     # Mock return value to simulate a assignment content item
     # Ideally we'd create an assignment in our database and create a content item with that unique identifier

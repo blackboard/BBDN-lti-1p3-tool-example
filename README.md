@@ -37,7 +37,6 @@ This stack deploys the LTI application directly to you AWS account.
 $ cdk deploy 
 ```
 
-At this point you can now deploy the stacks to you AWS account
 
 ### pipeline-stack (optional)
 This stack sets up a CI/CD pipeline connected to a GitHub repository which will build and deploy the LTI application when new code is checked in.
