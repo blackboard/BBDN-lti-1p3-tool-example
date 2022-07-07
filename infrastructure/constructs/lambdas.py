@@ -421,7 +421,7 @@ def flask_endpoint_lambda(scope: Construct, environment: dict, branch: str):
         f"flask-endpoint-{clean_name(branch)}",
         handler="app.wsgi.lambda_handler",
         environment=environment,
-        timeout=Duration.seconds(4),
+        timeout=Duration.seconds(10),
         memory_size=256,
     )
     return z.function, z.alias
