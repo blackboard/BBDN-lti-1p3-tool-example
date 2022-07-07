@@ -13,7 +13,7 @@ application = create_app()
 @application.errorhandler(werkzeug.exceptions.HTTPException)
 def application_error_handler(e):
     __log().error(e)
-    response = application.make_response(render_template("500.html", error=e))
+    response = application.make_response(render_template("error.html", error=e))
     return response
 
 
