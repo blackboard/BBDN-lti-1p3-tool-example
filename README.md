@@ -23,70 +23,67 @@ $ poetry shell
 
 ## Deployment
 
-Export your AWS account and region where the stacks will be deployed.
-
-```
-$ export AWS_DEFAULT_ACCOUNT=<YOUR_ACCOUNT_NUMBER>
-$ export AWS_DEFAULT_REGION=<YOUR_AWS_REGION>
-```
-
 If you haven't already be sure to bootstrap your cdk environment. ***This only needs to be done once***.
 
 ```
-$ cdk bootstrap aws://$AWS_DEFAULT_ACCOUNT/$AWS_DEFAULT_REGION
+$ cdk bootstrap
 ```
 
-At this point you can now deploy the stacks to you AWS account.
+At this point you can now deploy the stacks to your AWS account.
 
-### pipeline-stack
+### workshop-application-stack
+
+This stack deploys the LTI application directly to you AWS account.
+
+```
+$ cdk deploy 
+```
+
+### pipeline-stack (optional)
+
+This stack sets up a CI/CD pipeline connected to a GitHub repository which will build and deploy the LTI application when new code is checked in.
 
 To deploy the pipeline issue the following command:
 
 ```
-$ cdk deploy -c account=$AWS_DEFAULT_ACCOUNT -c region=$AWS_DEFAULT_REGION -c repo=<THE_GITHUB_ORG>/<THE_GIT_HUB_REPOSITORY> -c branch=$(git rev-parse --abbrev-ref HEAD) -c codestar_connection_arn=<CODESTART_CONNECTION_ARN> -a "python pipeline.py pipeline-stack-$(git rev-parse --abbrev-ref HEAD | sed -e 's/\//-/g')"
+$ cdk deploy -c account=$AWS_DEFAULT_ACCOUNT -c region=$AWS_DEFAULT_REGION -c repo=<THE_GITHUB_ORG>/<THE_GIT_HUB_REPOSITORY> -c branch=$(git rev-parse --abbrev-ref HEAD) -c codestar_connection_arn=<CODESTART_CONNECTION_ARN> pipeline-stack-$(git rev-parse --abbrev-ref HEAD | sed -e 's/\//-/g')
 ```
 
-To complete the pipeline setup you must go into the AWS Console, navigate to CodePipeline, on the left hand side expand "Settings" and click "Connections"
+To complete the pipeline setup you must go into the AWS Console, navigate to CodePipeline, on the left hand side expand "Settings" and click "Connections".
 
-![Connection settings](./images/connections01.png)
+![Connection settings](docs/images/connections01.png)
 
-Look for a connection with your repo name and a status of "Pending", click on this connection
+Look for a connection with your repo name and a status of "Pending", click on this connection.
 
-![Connection settings](./images/connections02.png)
+![Connection settings](docs/images/connections02.png)
 
-Click the button that says Update pending connection
+Click the button that says Update pending connection.
 
-![Connection settings](./images/connections03.png)
+![Connection settings](docs/images/connections03.png)
 
-Click "Install a new app"
+Click "Install a new app".
 
-![Connection settings](./images/connections04.png)
+![Connection settings](docs/images/connections04.png)
 
-Select the correct organization
+Select the correct organization.
 
-![Connection settings](./images/connections05.png)
+![Connection settings](docs/images/connections05.png)
 
-Ensure the right repository is selected, hit save (you may have to toggle the radio buttons to get the save button to activate)
+Ensure the right repository is selected, hit save (you may have to toggle the radio buttons to get the save button to activate).
 
-![Connection settings](./images/connections06.png)
+![Connection settings](docs/images/connections06.png)
 
-Finally, click "Connect" to complete the connection setup
+Finally, click "Connect" to complete the connection setup.
 
-![Connection settings](./images/connections07.png)
+![Connection settings](docs/images/connections07.png)
 
 Once the connection to github is complete you can trigger the pipeline by checking code into the configured branch or manually triggering the pipeline by clicking the "Release change" button in the AWS Console.
 
 You should deploy the pipeline stack first before.
 
-### application-stack
+### Run locally with Flask
 
-To deploy the application directly without a pipeline issue this command:
-
-```
-$ cdk deploy -c account=$AWS_DEFAULT_ACCOUNT -c region=$AWS_DEFAULT_REGION -c repo=<THE_GITHUB_ORG>/<THE_GIT_HUB_REPOSITORY> -c branch=$(git rev-parse --abbrev-ref HEAD) -c codestar_connection_arn=<CODESTART_CONNECTION_ARN> application-stack-$(git rev-parse --abbrev-ref HEAD | sed -e 's/\//-/g')
-```
-
-You can also run [localy](#configuring-local-environment) using the following command:
+You can also run [locally](#configuring-local-environment) using the following command:
 
 ```
 $ flask run
@@ -125,9 +122,31 @@ export LEARN_APPLICATION_SECRET_KEY='/keys/somewhere/learn_secret'```
 
 We suggest the use of [Mkdocs](https://www.mkdocs.org/getting-started/) for documentation.
 
-#### Install
 
 ````
+
+These values can be obtained in the aws console.
+
+![AWS Credentials](docs/images/aws-credentials01.png)
+
+Here you will find your `AWS_DEFAULT_ACCOUNT` and `AWS_PROFILE` (without the square brackets).
+
+![AWS Credentials](docs/images/aws-credentials02.png)
+
+You could also set your AWS credentials file (typically found at ~/.aws/credentials) by creating it through the terminal
+with the credentials that AWS provides to you in the option 2.
+
+```
+touch ~/.aws/credentials
+```
+
+![AWS Credentials](docs/images/aws-credentials03.png)
+
+For the `TABLE_NAME` you need to create a DynamoDB table with the partition key (PK) of type string and the name you provide
+to the table will be your variable.
+
+![AWS Credentials](docs/images/aws-credentials04.png)
+![AWS Credentials](docs/images/aws-credentials05.png)
 
 pip install mkdocs
 
