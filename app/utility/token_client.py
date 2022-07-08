@@ -88,7 +88,6 @@ class TokenClient:
         jwt = LTIJwtPayload()
         time_now = datetime.datetime.now(tz=datetime.timezone.utc)
 
-        # TODO: get timeout seconds from jwt.py
         payload = dict(
             aud=platform.config.auth_token_url,
             exp=timegm(
