@@ -116,13 +116,7 @@ export KMS_SYMMETRIC_KEY_ID='arn:aws:kms:???'
 # The next three are stored in ParameterStore. Create keys for your instance
 export LTI_TOOLING_API_URL_KEY='/keys/somewhere/tool_url'
 export LEARN_APPLICATION_KEY_KEY='/keys/somewhere/learn_key'
-export LEARN_APPLICATION_SECRET_KEY='/keys/somewhere/learn_secret'```
-
-### MKDocs
-
-We suggest the use of [Mkdocs](https://www.mkdocs.org/getting-started/) for documentation.
-
-
+export LEARN_APPLICATION_SECRET_KEY='/keys/somewhere/learn_secret'
 ````
 
 These values can be obtained in the AWS console.
@@ -157,31 +151,27 @@ mentioned in the [workshop application stack section](#workshop-application-stac
 
 ![AWS Credentials](docs/images/aws-credentials07.png)
 
+## Contributing
 
+### MKDocs
 
+We suggest the use of [Mkdocs](https://www.mkdocs.org/getting-started/) for documentation.
 
+```
 pip install mkdocs
-
 ```
 
 #### Serve
 
 ```
-
 mkdocs serve
-
 ```
 
-#### Pre-commit hooks
+### Pre-commit hooks
 
 This project has a set of hooks for [pre-commit](https://pre-commit.com/) for formatting.
-
-To install this hooks into your repo, run.
+To install this hooks into your repo, run:
 
 ```
-
 pre-commit install
-
-```
-
 ```
