@@ -33,7 +33,7 @@ At this point you can now deploy the stacks to your AWS account.
 
 ### workshop-application-stack
 
-This stack deploys the LTI application directly to you AWS account.
+This stack deploys the LTI application directly to your AWS account.
 
 ```
 $ cdk deploy 
@@ -125,7 +125,7 @@ We suggest the use of [Mkdocs](https://www.mkdocs.org/getting-started/) for docu
 
 ````
 
-These values can be obtained in the aws console.
+These values can be obtained in the AWS console.
 
 ![AWS Credentials](docs/images/aws-credentials01.png)
 
@@ -142,11 +142,23 @@ touch ~/.aws/credentials
 
 ![AWS Credentials](docs/images/aws-credentials03.png)
 
+Alternatively you could set your environment variables through the terminal with the credentials that AWS provides to you in the option 1.
+
+![AWS Credentials](docs/images/aws-credentials04.png)
+
 For the `TABLE_NAME` you need to create a DynamoDB table with the partition key (PK) of type string and the name you provide
 to the table will be your variable.
 
-![AWS Credentials](docs/images/aws-credentials04.png)
 ![AWS Credentials](docs/images/aws-credentials05.png)
+![AWS Credentials](docs/images/aws-credentials06.png)
+
+For the `KMS_KEY_ID` and `KMS_SYMMETRIC_KEY_ID` the values are the ones you get when you execute the `cdk deploy`command 
+mentioned in the [workshop application stack section](#workshop-application-stack).
+
+![AWS Credentials](docs/images/aws-credentials07.png)
+
+
+
 
 pip install mkdocs
 
