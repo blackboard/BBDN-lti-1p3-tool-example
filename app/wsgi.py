@@ -4,10 +4,17 @@ import aws_lambda_wsgi
 
 from app import create_app
 from app.utility import init_logger
+from flask import render_template
+import werkzeug
 
-# Need to use pipelines to get the right crypto libs
-# application = create_app()
 application = create_app()
+
+
+@application.errorhandler(werkzeug.exceptions.HTTPException)
+def application_error_handler(e):
+    __log().error(e)
+    response = application.make_response(render_template("error.html", error=e))
+    return response
 
 
 def lambda_handler(event, context):

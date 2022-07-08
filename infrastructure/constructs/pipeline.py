@@ -40,7 +40,7 @@ class Pipeline(Construct):
                 "poetry install",
             ],
             commands=[
-                f'poetry run cdk synth -c account={aws_cdk.Aws.ACCOUNT_ID} -c region={aws_cdk.Aws.REGION} -c repo={repo} -c branch={branch} -c codestar_connection_arn={codestar_connection_arn} -a "python pipeline.py pipeline-stack-{branch}" '
+                f'poetry run cdk synth -c account={aws_cdk.Aws.ACCOUNT_ID} -c region={aws_cdk.Aws.REGION} -c repo={repo} -c branch={branch} -c codestar_connection_arn={codestar_connection_arn} -a "python pipeline.py" '
             ],
         )
         code_build_options = pipelines.CodeBuildOptions(

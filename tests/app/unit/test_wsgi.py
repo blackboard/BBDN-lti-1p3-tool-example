@@ -19,13 +19,13 @@ from moto import mock_kms
 from moto import mock_ssm
 
 from app import wsgi
-from app.ims.models.jwks import Jwk
-from app.ims.models.jwks import JwkStorage
-from app.ims.models.state import LTIState
-from app.ims.models.state import LTIStateStorage
-from app.ims.models.tool_config import LTITool
-from app.ims.models.tool_config import LTIToolStorage
-from app.ims.utility.aws import Aws
+from app.models.jwks import Jwk
+from app.models.jwks import JwkStorage
+from app.models.state import LTIState
+from app.models.state import LTIStateStorage
+from app.models.tool_config import LTITool
+from app.models.tool_config import LTIToolStorage
+from app.utility.aws import Aws
 from tests.app import handle_exception
 from tests.app import read_file
 
