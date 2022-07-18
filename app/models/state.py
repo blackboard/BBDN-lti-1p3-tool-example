@@ -103,11 +103,11 @@ class LTIState:
     def __log(self):
         return logging.getLogger("LTIPlatform")
 
-    def load(self, id: str):
+    def load(self, record_id: str):
         try:
             response = self._storage.ddbclient.get_item(
                 TableName=self._storage.TABLE_NAME,
-                Key={"PK": {"S": f"STATE#{id}"}},
+                Key={"PK": {"S": f"STATE#{record_id}"}},
             )
             if "Item" in response:
                 deserializer = TypeDeserializer()
@@ -115,7 +115,7 @@ class LTIState:
                 self.record = LTIStateRecord(**r)
 
             else:
-                self.__log().warning(f"No State record found for STATE#{id}.")
+                self.__log().warning(f"No State record found for STATE#{record_id}.")
 
             return self
         except botocore.exceptions.ClientError as error:

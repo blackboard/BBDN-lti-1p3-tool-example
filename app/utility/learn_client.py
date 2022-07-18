@@ -10,7 +10,8 @@ import requests
 
 from app.models.jwt import LTIJwtPayload
 from app.models.platform_config import LTIPlatform
-from app.models.state import LTIStateStorage, LTIState
+from app.models.state import LTIState
+from app.models.state import LTIStateStorage
 from app.models.tool_config import LTITool
 from app.models.tool_config import LTIToolStorage
 from app.utility import init_logger
@@ -35,7 +36,5 @@ class LearnClient:
         if response.status_code == 200:
             return response.json()
         else:
-            self.__log().error(
-                f"Error getting course info via Learn public API, status: {response.status_code}"
-            )
+            self.__log().error(f"Error getting course info via Learn public API, status: {response.status_code}")
             return {}

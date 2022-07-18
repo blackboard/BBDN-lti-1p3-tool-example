@@ -62,7 +62,7 @@ def launch(request):
 
         # Load the global config for this Tool
         lti_tool = LTITool(LTIToolStorage())
-        # Reqest an access token for use for LTI 1.3 based Tool Originating Messages
+        # Request an access token for use for LTI 1.3 based Tool Originating Messages
         lti_token = TokenClient().request_bearer_token(
             platform=platform, grantType=GrantType.CLIENT_CREDENTIALS, tool=lti_tool
         )
@@ -115,11 +115,7 @@ def render_ui(jwt_request: LTIJwtPayload, state, id_token):
     course_date = ""
     if jwt_request.platform_product_code == "BlackboardLearn":
         course_info = LearnClient().get_course_info(jwt_request, state)
-        course_date = (
-            course_info["modified"]
-            if "modified" in course_info
-            else ""
-        )
+        course_date = course_info["modified"] if "modified" in course_info else ""
 
     if jwt_request.message_type == "LtiResourceLinkRequest":
         action_url = f"{tool.config.base_url()}/submit_assignment"
@@ -144,4 +140,3 @@ def render_ui(jwt_request: LTIJwtPayload, state, id_token):
         )
     else:
         abort(409, "InvalidParameterException - Unknown message type")
-

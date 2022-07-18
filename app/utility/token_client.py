@@ -32,31 +32,21 @@ class TokenClient:
         init_logger("TokenClient")
 
     @staticmethod
-    def request_bearer_token(
-        platform: LTIPlatform, grantType: GrantType, tool: LTITool
-    ) -> str:
+    def request_bearer_token(platform: LTIPlatform, grantType: GrantType, tool: LTITool) -> str:
 
         logging.debug(f"GrantType: {grantType}")
         access_token: str
 
         if grantType == GrantType.CLIENT_CREDENTIALS:
-            access_token = TokenClient.__request_bearer_client_credential(
-                platform=platform, tool=tool
-            )
+            access_token = TokenClient.__request_bearer_client_credential(platform=platform, tool=tool)
         elif grantType == GrantType.AUTH_CODE:
-            access_token = TokenClient.__request_bearer_auth_code(platform=platform)
+            access_token = TokenClient.__request_bearer_auth_code()
 
         return access_token
 
     @staticmethod
     def get_learn_access_token(learn_url, redirect_url, auth_code):
-        oauth_url = (
-            learn_url
-            + "/learn/api/public/v1/oauth2/token?code="
-            + auth_code
-            + "&redirect_uri="
-            + redirect_url
-        )
+        oauth_url = learn_url + "/learn/api/public/v1/oauth2/token?code=" + auth_code + "&redirect_uri=" + redirect_url
 
         # Authenticate
         payload = {"grant_type": "authorization_code"}
@@ -68,7 +58,7 @@ class TokenClient:
         )
 
         if not r.ok:
-            msg = f"Error retrieving access token from platfom {oauth_url}. {r.reason}: {r.text}"
+            msg = f"Error retrieving access token from platform {oauth_url}. {r.reason}: {r.text}"
             logging.error(msg)
             raise Exception(msg)
 
@@ -88,12 +78,9 @@ class TokenClient:
         jwt = LTIJwtPayload()
         time_now = datetime.datetime.now(tz=datetime.timezone.utc)
 
-        # TODO: get timeout seconds from jwt.py
         payload = dict(
             aud=platform.config.auth_token_url,
-            exp=timegm(
-                (time_now + datetime.timedelta(seconds=int(300))).utctimetuple()
-            ),
+            exp=timegm((time_now + datetime.timedelta(seconds=int(300))).utctimetuple()),
             jti=secrets.token_hex(16),
             iat=timegm(time_now.utctimetuple()),
             iss=platform.config.client_id,

@@ -35,21 +35,21 @@ def register(request):
         abort(400, "InvalidParameterException - missing config data")
 
     data["PK"] = ""
-    config = LTIPlatformConfig(
+    platform_config = LTIPlatformConfig(
         **data,
     )
 
-    if not config.client_id:
+    if not platform_config.client_id:
         abort(400, "InvalidParameterException - Missing lti_deployment_id")
-    if not config.lti_deployment_id:
+    if not platform_config.lti_deployment_id:
         abort(400, "InvalidParameterException - Missing lti_deployment_id")
-    if not config.auth_token_url:
+    if not platform_config.auth_token_url:
         abort(400, "InvalidParameterException - Missing auth_token_url")
-    if not config.auth_login_url:
+    if not platform_config.auth_login_url:
         abort(400, "InvalidParameterException - Missing auth_login_url")
-    if not config.iss:
+    if not platform_config.iss:
         abort(400, "InvalidParameterException - Missing iss")
-    if not config.key_set_url:
+    if not platform_config.key_set_url:
         abort(400, "InvalidParameterException - Missing key_set_url")
 
     # Get the Learn application key and secret and save them
@@ -61,7 +61,7 @@ def register(request):
         tool.set_learn_app_key_and_secret(learn_app_key, learn_app_secret)
 
     try:
-        platform = LTIPlatform(LTIPlatformStorage(), config=config).save()
+        platform = LTIPlatform(LTIPlatformStorage(), config=platform_config).save()
 
         return (
             platform.config.json(),

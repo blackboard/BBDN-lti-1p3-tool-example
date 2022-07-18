@@ -80,7 +80,6 @@ class ApplicationStack(Stack):
         )
 
 
-
 class PipelineStack(Stack):
     def __init__(
         self,

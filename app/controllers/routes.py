@@ -5,11 +5,12 @@ from flask import Blueprint
 from flask import current_app
 from flask import request
 
-from app.controllers import assignment_controller, rest_auth_controller
+from app.controllers import assignment_controller
 from app.controllers import config_controller
 from app.controllers import launch_controller
 from app.controllers import oidc_controller
 from app.controllers import platform_controller
+from app.controllers import rest_auth_controller
 from app.utility import init_logger
 
 blueprint = Blueprint("", __name__, template_folder="templates")
