@@ -115,11 +115,7 @@ def render_ui(jwt_request: LTIJwtPayload, state, id_token):
     course_date = ""
     if jwt_request.platform_product_code == "BlackboardLearn":
         course_info = LearnClient().get_course_info(jwt_request, state)
-        course_date = (
-            course_info["modified"]
-            if "modified" in course_info
-            else ""
-        )
+        course_date = course_info["modified"] if "modified" in course_info else ""
 
     if jwt_request.message_type == "LtiResourceLinkRequest":
         action_url = f"{tool.config.base_url()}/submit_assignment"
@@ -144,4 +140,3 @@ def render_ui(jwt_request: LTIJwtPayload, state, id_token):
         )
     else:
         abort(409, "InvalidParameterException - Unknown message type")
-

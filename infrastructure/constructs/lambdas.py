@@ -237,9 +237,7 @@ class CodeZip(Construct):
         if root_folder_name == "site-packages":
             include_root = False
             root_folder_path = root_folder_path + os.path.sep
-        relative_path = absolute_path.replace(
-            root_folder_path, root_folder_name if include_root else ""
-        )
+        relative_path = absolute_path.replace(root_folder_path, root_folder_name if include_root else "")
         if relative_path_prefix is not None:
             relative_path = os.path.join(relative_path_prefix, relative_path)
         if CodeZip.__EXCLUDED_PATHS.search(folder_name) is None:
@@ -306,9 +304,7 @@ class LambdaZip(CodeZip):
         relative_path_prefix=None,
         timeout: Optional[Duration] = None,
         memory_size: int = 256,
-        deployment_config: Optional[
-            codedeploy.ILambdaDeploymentConfig
-        ] = codedeploy.LambdaDeploymentConfig.ALL_AT_ONCE,
+        deployment_config: Optional[codedeploy.ILambdaDeploymentConfig] = codedeploy.LambdaDeploymentConfig.ALL_AT_ONCE,
         **kwargs,
     ):
         super().__init__(

@@ -26,19 +26,21 @@ $ poetry shell
 If you haven't already be sure to bootstrap your cdk environment. This only needs to be done once.
 
 ```
-$ cdk bootstrap 
+$ cdk bootstrap
 ```
 
 At this point you can now deploy the stacks to your AWS account
 
 ### workshop-application-stack
-This stack deploys the LTI application directly to you AWS account.
-```
-$ cdk deploy 
-```
 
+This stack deploys the LTI application directly to you AWS account.
+
+```
+$ cdk deploy
+```
 
 ### pipeline-stack (optional)
+
 This stack sets up a CI/CD pipeline connected to a GitHub repository which will build and deploy the LTI application when new code is checked in.
 
 To deploy the pipeline issue the following command
@@ -80,6 +82,7 @@ Once the connection to github is complete you can trigger the pipeline by checki
 You should deploy the pipeline stack first before
 
 ### Run locally with Flask
+
 You can also run locally using the following command
 
 ```
