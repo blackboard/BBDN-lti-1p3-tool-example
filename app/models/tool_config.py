@@ -10,6 +10,7 @@ from app.models.jwks import JwkStorage
 from app.utility import init_logger
 from app.utility.aws import Aws
 
+
 class LTIToolConfig(BaseModel):
     url: str
     learn_app_key: Optional[str] = None
@@ -24,6 +25,7 @@ class LTIToolConfig(BaseModel):
     def base_url(self) -> str:
         return self.url.rstrip("/")
 
+
 class LTIToolStorage:
     def __init__(self):
         aws = Aws()
@@ -33,6 +35,7 @@ class LTIToolStorage:
         if not hasattr(cls, "instance"):
             cls.instance = super(LTIToolStorage, cls).__new__(cls)
         return cls.instance
+
 
 class LTITool:
     def __init__(self, lti_storage: LTIToolStorage):
@@ -77,9 +80,7 @@ class LTITool:
 
     def __get_secret_value(self, secret_name: str, with_encryption: bool) -> str:
         try:
-            response = self._storage.ssm_client.get_parameter(
-                Name=secret_name, WithDecryption=with_encryption
-            )
+            response = self._storage.ssm_client.get_parameter(Name=secret_name, WithDecryption=with_encryption)
             if response and "Parameter" in response and "Value" in response["Parameter"]:
                 return response["Parameter"]["Value"]
             else:
@@ -105,4 +106,3 @@ class LTITool:
             msg = f"Saving parameter {secret_name} to SSM. {error}"
             self.__log().error()
             raise Exception(msg)
-            
