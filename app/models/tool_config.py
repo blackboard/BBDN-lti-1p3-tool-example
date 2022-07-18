@@ -103,6 +103,6 @@ class LTITool:
             )
         except botocore.exceptions.ClientError as error:
             msg = f"Saving parameter {secret_name} to SSM. {error}"
-            self.__log().error()
+            self.__log().error(msg)
             raise Exception(msg)
             

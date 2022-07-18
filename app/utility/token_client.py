@@ -44,7 +44,7 @@ class TokenClient:
                 platform=platform, tool=tool
             )
         elif grantType == GrantType.AUTH_CODE:
-            access_token = TokenClient.__request_bearer_auth_code(platform=platform)
+            access_token = TokenClient.__request_bearer_auth_code()
 
         return access_token
 
@@ -68,7 +68,7 @@ class TokenClient:
         )
 
         if not r.ok:
-            msg = f"Error retrieving access token from platfom {oauth_url}. {r.reason}: {r.text}"
+            msg = f"Error retrieving access token from platform {oauth_url}. {r.reason}: {r.text}"
             logging.error(msg)
             raise Exception(msg)
 
