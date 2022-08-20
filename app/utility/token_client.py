@@ -108,7 +108,7 @@ class TokenClient:
             "client_assertion": jwtstring,
             "scope": lti_scopes,
         }
-
+        logging.debug(auth_request)
         r = requests.post(platform.config.auth_token_url, data=auth_request)
         if not r.ok:
             msg = f"Error retrieving access token from platform {platform.config.auth_token_url}. {r.reason}: {r.text}"
