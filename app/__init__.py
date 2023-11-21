@@ -18,9 +18,8 @@ def init_app() -> Flask:
     return application
 
 
-def create_app(config=None):
+def create_app():
     """
-    :param config:
     :return:
     """
     application = init_app()

@@ -1,11 +1,11 @@
 import logging
 
 import aws_lambda_wsgi
+import werkzeug
+from flask import render_template
 
 from app import create_app
 from app.utility import init_logger
-from flask import render_template
-import werkzeug
 
 application = create_app()
 

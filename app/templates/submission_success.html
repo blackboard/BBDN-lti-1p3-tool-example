@@ -1,37 +1,36 @@
 {% extends 'base.html' %} {% block title %}AWS Workshop{% endblock %} {% block header %}AWS Workshop{% endblock %} {%
 block app_content %}
 <div class="container">
-    <header class="App-header rounded-top-4 fw-semibold">Welcome {{ name }}</header>
-    <div class="shadow-lg p-3 mb-5 bg-body rounded-bottom-4 container position-relative">
+  <header class="App-header rounded-top-4 fw-semibold">Welcome {{ name }}</header>
+  <div class="shadow-lg p-3 mb-5 bg-body rounded-bottom-4 container position-relative">
     <h2 class="m-1 h2 fw-semibold">Congratulations on submitting your assignment!</h2>
-    </div>
-    <div class="m-1 accordion accordion-flush" id="accordionFlush">
-        <div class="accordion-item">
-            <h2 class="m-1 h2 accordion-header fw-semibold" id="flush-headingOne">
-                <button
-                        class="accordion-button collapsed bg-secondary text-dark"
-                        type="button"
-                        data-bs-toggle="collapse"
-                        data-bs-target="#flush-collapseOne"
-                        aria-expanded="false"
-                        aria-controls="flush-collapseOne"
-                >
-                    JSON sample
-                </button>
-            </h2>
-            <div
-                    id="flush-collapseOne"
-                    class="accordion-collapse collapse"
-                    aria-labelledby="flush-headingOne"
-                    data-bs-parent="#accordionFlushExample"
-            >
-                <div class="accordion-body">
-                    <pre>{{pretty_body}}</pre>
-                </div>
-            </div>
+  </div>
+  <div class="m-1 accordion accordion-flush" id="accordionFlush">
+    <div class="accordion-item">
+      <h2 class="m-1 h2 accordion-header fw-semibold" id="flush-headingOne">
+        <button
+          class="accordion-button collapsed bg-secondary text-dark"
+          type="button"
+          data-bs-toggle="collapse"
+          data-bs-target="#flush-collapseOne"
+          aria-expanded="false"
+          aria-controls="flush-collapseOne"
+        >
+          JSON sample
+        </button>
+      </h2>
+      <div
+        id="flush-collapseOne"
+        class="accordion-collapse collapse"
+        aria-labelledby="flush-headingOne"
+        data-bs-parent="#accordionFlushExample"
+      >
+        <div class="accordion-body">
+          <pre>{{pretty_body}}</pre>
         </div>
-
+      </div>
     </div>
+  </div>
 </div>
 {% endblock %} {% block script %}
 <script type="application/javascript"></script>
